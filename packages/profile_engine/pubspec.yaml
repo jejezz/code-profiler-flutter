@@ -1,6 +1,6 @@
 name: profile_engine
-description: A starting point for Dart libraries or applications.
-version: 1.0.0
+description: Analyzes project folders and recommends VS Code profiles and settings.
+version: 0.1.0
 # repository: https://github.com/my_org/my_repo
 
 environment:
@@ -8,6 +8,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
+  yaml: ^3.1.4
   # path: ^1.9.0
 
 dev_dependencies:

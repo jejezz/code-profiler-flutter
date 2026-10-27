@@ -502,27 +502,27 @@ macOS entitlements(샌드박스 해제, `com.apple.security.app-sandbox: false`)
 
 ### Phase 1 — 모델과 규칙 로딩
 
-- [ ] 2장의 모델 + JSON 직렬화
-- [ ] `Result<T>` 타입
-- [ ] rules.yaml 로딩·검증, 사용자 규칙 병합
-- [ ] 3.2의 기본 규칙 파일
+- [x] 2장의 모델 + JSON 직렬화
+- [x] `Result<T>` 타입
+- [x] rules.yaml 로딩·검증, 사용자 규칙 병합
+- [x] 3.2의 기본 규칙 파일 (`assets/rules.yaml`). 컴파일된 엔진 CLI에는 assets가 따라가지 않아 `tool/gen_default_rules.dart`가 `lib/src/rules/default_rules.dart` 상수로 내장하고, 테스트가 둘의 동기화를 검사한다
 
 **완료 기준**: 모델 왕복 직렬화 테스트, 규칙 로딩 성공/실패 테스트 통과.
 
 ### Phase 2 — 분석기
 
-- [ ] 스캐너: 깊이·파일 수 상한, skipDirs, followLinks false, TreeStats
-- [ ] 매처: file, dir, fileContains, variable, all/any 중첩
-- [ ] 변수 해석: findUpward
-- [ ] suppresses, priority 정렬
-- [ ] `Isolate.run()`으로 감싼 공개 API `analyze(path)`
+- [x] 스캐너: 깊이·파일 수 상한, skipDirs, followLinks false, TreeStats
+- [x] 매처: file, dir, fileContains, variable, all/any 중첩
+- [x] 변수 해석: findUpward
+- [x] suppresses, priority 정렬
+- [x] `Isolate.run()`으로 감싼 공개 API `analyze(path)`
 
 **완료 기준**: 8.1 픽스처 전부 기대 결과와 일치.
 
 ### Phase 3 — 추천기와 설정 처리
 
-- [ ] 3.3 판정 규칙에 따른 Recommendation 생성
-- [ ] JSONC 파서, 병합, diff, 백업 후 원자적 쓰기
+- [x] 3.3 판정 규칙에 따른 Recommendation 생성
+- [x] JSONC 파서, 병합, diff, 백업 후 원자적 쓰기
 
 **완료 기준**: 8.2의 JSONC·병합·변수 치환 테스트 통과. 픽스처에 대해 추천 결과 스냅샷 테스트.
 
