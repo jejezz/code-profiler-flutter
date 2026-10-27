@@ -190,4 +190,317 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get updateBusyBody => '작업이 진행 중입니다. 끝난 뒤에 다시 시도해 주세요.';
+
+  @override
+  String get commonCancel => '취소';
+
+  @override
+  String get commonDelete => '삭제';
+
+  @override
+  String get commonRetry => '다시 시도';
+
+  @override
+  String get commonCopy => '복사';
+
+  @override
+  String get appSettingsTooltip => '설정';
+
+  @override
+  String get projectAdd => '프로젝트 추가';
+
+  @override
+  String get projectPickFolderTitle => '프로젝트 폴더 선택';
+
+  @override
+  String get projectDropHere => '여기에 놓아 프로젝트 추가';
+
+  @override
+  String projectDropNotFolder(String name) {
+    return '폴더만 추가할 수 있습니다: $name';
+  }
+
+  @override
+  String get projectOpen => 'VS Code로 열기';
+
+  @override
+  String get projectOpenNeedsProfile => '먼저 분석하고 설정을 적용하세요';
+
+  @override
+  String get projectAnalyze => '분석 · 추천';
+
+  @override
+  String get projectRemove => '목록에서 제거';
+
+  @override
+  String get projectRemoveTitle => '프로젝트를 목록에서 제거할까요?';
+
+  @override
+  String projectRemoveBody(String name) {
+    return '$name 은(는) 목록에서만 지워지고, 폴더와 파일은 그대로 남습니다.';
+  }
+
+  @override
+  String get projectNoAnalysis => '분석 전';
+
+  @override
+  String get projectNoProfile => '프로필 없음';
+
+  @override
+  String projectLastOpened(String date) {
+    return '마지막 열기 $date';
+  }
+
+  @override
+  String get projectNeverOpened => '열어 본 적 없음';
+
+  @override
+  String projectLoadError(String message) {
+    return '프로젝트 목록을 읽지 못했습니다: $message';
+  }
+
+  @override
+  String get projectLocal => '로컬';
+
+  @override
+  String openFailed(String message) {
+    return 'VS Code를 열지 못했습니다: $message';
+  }
+
+  @override
+  String get analysisTitle => '분석 결과';
+
+  @override
+  String get analysisRunning => '폴더를 분석하는 중…';
+
+  @override
+  String get analysisFailed => '분석에 실패했습니다';
+
+  @override
+  String get analysisNoTypes =>
+      '판정된 프로젝트 유형이 없습니다. 폴더 구성을 확인하거나 사용자 규칙을 추가하세요.';
+
+  @override
+  String get analysisPrimaryBadge => '주 유형';
+
+  @override
+  String analysisPriority(String value) {
+    return '우선순위 $value';
+  }
+
+  @override
+  String get analysisCompetitorsTitle => '근접 경쟁 후보';
+
+  @override
+  String analysisCompetitorsBody(String names) {
+    return '$names 도 비슷한 우선순위로 맞았지만 다른 프로필을 씁니다. 추천 편집 화면에서 바꿀 수 있습니다.';
+  }
+
+  @override
+  String analysisStats(String count) {
+    return '스캔한 파일 $count개';
+  }
+
+  @override
+  String get analysisTruncated => '파일 수 상한에서 스캔을 멈췄습니다. 작업 모듈 폴더만 여는 것을 권장합니다.';
+
+  @override
+  String analysisSkippedDirs(String names) {
+    return '들어가지 않은 폴더: $names';
+  }
+
+  @override
+  String get analysisVariables => '해석된 변수';
+
+  @override
+  String get analysisNext => '추천 보기';
+
+  @override
+  String get recommendTitle => '추천 편집';
+
+  @override
+  String get recommendPrimaryType => '주 유형';
+
+  @override
+  String get recommendProfile => '프로필 이름';
+
+  @override
+  String get recommendProfileHelp => 'VS Code 프로필 이름입니다. 없으면 새로 만들어집니다.';
+
+  @override
+  String get recommendProfileSuggestions => '추천 이름';
+
+  @override
+  String get recommendProfileEmpty => '프로필 이름을 입력하세요';
+
+  @override
+  String get recommendProfileInvalid => '프로필 이름에 쓸 수 없는 문자가 있습니다';
+
+  @override
+  String get recommendExtensionsRequired => '추천 확장';
+
+  @override
+  String get recommendExtensionsOptional => '선택 확장 (다른 유형)';
+
+  @override
+  String get recommendSettings => '설정 패치';
+
+  @override
+  String recommendSettingsCount(String count) {
+    return '$count개 항목';
+  }
+
+  @override
+  String get recommendNotes => '안내';
+
+  @override
+  String get recommendNone => '추천할 내용이 없습니다';
+
+  @override
+  String get recommendNext => '설정 비교';
+
+  @override
+  String get diffTitle => '설정 비교';
+
+  @override
+  String get diffLoading => '비교하는 중…';
+
+  @override
+  String get diffFailed => '비교하지 못했습니다';
+
+  @override
+  String get diffNewFile => 'settings.json 이 새로 만들어집니다.';
+
+  @override
+  String get diffNoChange => 'settings.json 은 바뀌지 않습니다.';
+
+  @override
+  String get diffCommentsWarning =>
+      '기존 settings.json 의 주석이 사라집니다. 적용하기 전에 .bak 백업이 만들어집니다.';
+
+  @override
+  String diffAdded(String count) {
+    return '추가 ($count)';
+  }
+
+  @override
+  String diffConflicts(String count) {
+    return '충돌 — 기존 값 유지 ($count)';
+  }
+
+  @override
+  String diffUnchanged(String count) {
+    return '변경 없음 ($count)';
+  }
+
+  @override
+  String get diffReplace => '패치 값으로 교체';
+
+  @override
+  String get diffExisting => '기존';
+
+  @override
+  String get diffPatch => '패치';
+
+  @override
+  String get diffMergedPreview => '적용 후 파일 내용';
+
+  @override
+  String get diffApply => '적용';
+
+  @override
+  String get applyTitle => '적용';
+
+  @override
+  String get applyStepExtensions => '확장 설치';
+
+  @override
+  String get applyStepSettings => '설정 쓰기';
+
+  @override
+  String get applyNoExtensions => '설치할 확장이 없습니다.';
+
+  @override
+  String applyExtSkipped(String id) {
+    return '이미 설치됨: $id';
+  }
+
+  @override
+  String applyExtInstalling(String id) {
+    return '설치 중: $id';
+  }
+
+  @override
+  String applyExtFailed(String id, String code) {
+    return '설치 실패: $id (종료 코드 $code)';
+  }
+
+  @override
+  String get applySettingsWritten => 'settings.json 을 갱신했습니다.';
+
+  @override
+  String applySettingsBackup(String path) {
+    return '백업: $path';
+  }
+
+  @override
+  String get applySettingsUnchanged => '바뀐 내용이 없어 파일을 쓰지 않았습니다.';
+
+  @override
+  String get applyDone => '적용을 마쳤습니다';
+
+  @override
+  String applyFailedStep(String step, String message) {
+    return '$step 단계에서 실패했습니다: $message';
+  }
+
+  @override
+  String applySaveFailed(String message) {
+    return '프로젝트 정보를 저장하지 못했습니다: $message';
+  }
+
+  @override
+  String get applyBackToList => '목록으로';
+
+  @override
+  String get settingsTitle => '설정';
+
+  @override
+  String get settingsCodePath => 'VS Code 실행 파일(code) 경로';
+
+  @override
+  String get settingsCodePathHint => '비워 두면 자동으로 찾습니다';
+
+  @override
+  String get settingsDetect => '자동 탐지';
+
+  @override
+  String get settingsBrowse => '찾아보기';
+
+  @override
+  String get settingsTest => '확인';
+
+  @override
+  String get settingsSave => '저장';
+
+  @override
+  String settingsDetected(String path) {
+    return '찾은 경로: $path';
+  }
+
+  @override
+  String get settingsNotFound => 'VS Code를 찾지 못했습니다. 경로를 직접 지정하세요.';
+
+  @override
+  String settingsTestOk(String version) {
+    return 'VS Code $version';
+  }
+
+  @override
+  String settingsTestFailed(String message) {
+    return '실행하지 못했습니다: $message';
+  }
+
+  @override
+  String get settingsSaved => '저장했습니다';
 }

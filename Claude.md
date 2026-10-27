@@ -37,7 +37,7 @@ https://github.com/jejezz/application-release-templates/tree/main/conventions
 - Flutter 3.x stable, 데스크톱 타깃: Linux, macOS, Windows
 - Dart 3.x (sealed class, records, pattern matching 사용)
 - 상태 관리: `flutter_riverpod`
-- 패키지: `yaml`, `path`, `path_provider`, `file_picker`, `desktop_drop`, `args`(엔진 CLI), `test`
+- 패키지: `yaml`, `path`, `file_picker`, `desktop_drop`, `args`(엔진 CLI), `test` (`path_provider`는 쓰지 않는다 — 앱 데이터 폴더는 규약 identity.md §6대로 직접 계산)
 - application-release-templates 공통 패키지(Phase 0 부트스트랩에서 추가): `window_manager`, `screen_retriever`,
   `package_info_plus`, `url_launcher`, `shared_preferences`, `intl`, `flutter_localizations`(sdk)
 - 영속화: 1단계는 앱 지원 디렉터리의 JSON 파일. SQLite(`drift`)는 필요해질 때만 도입
@@ -136,7 +136,7 @@ flutter run -d linux     # 또는 macos, windows
 ### 플랫폼
 
 16. macOS: `macos/Runner/DebugProfile.entitlements`와 `Release.entitlements`에서 `com.apple.security.app-sandbox`를 `false`로 둡니다(외부 프로세스 실행, 임의 폴더 접근 필요).
-17. Windows: `code`는 `code.cmd`이므로 `runInShell: true`가 필요합니다. `code` 경로는 사용자가 설정에서 바꿀 수 있어야 합니다.
+17. Windows: `code`는 `code.cmd`(배치 파일)입니다. `runInShell: true`로 실행하면 공백이 든 설치 경로와 공백이 든 프로필 이름이 함께 올 때 `cmd`의 따옴표 처리 때문에 깨지므로("'...\Microsoft' 은(는) 명령이 아닙니다"), 셸 없이 직접 실행합니다. 배치 파일은 `cmd`가 인자를 해석하므로 인자 속 셸 특수문자(`& | < > ^ % "`)는 거부합니다. 프로세스 출력은 UTF-8로 읽고 실패하면 시스템 인코딩(cp949 등)으로 다시 읽습니다. `code` 경로는 사용자가 설정에서 바꿀 수 있어야 합니다.
 
 ## 코드 스타일
 

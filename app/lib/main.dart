@@ -8,6 +8,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'about/about_dialog.dart';
@@ -15,15 +16,20 @@ import 'about/app_menu_bar.dart';
 import 'about/extra_licenses.dart';
 import 'app_identity.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/providers.dart';
+import 'screens/project_list_screen.dart';
+import 'services/app_config.dart';
+import 'services/app_paths.dart';
+import 'services/json_file_store.dart';
+import 'services/project_store.dart';
 import 'settings/app_settings.dart';
-import 'settings/settings_menus.dart';
 import 'theme/app_theme.dart';
 import 'update/update_scope.dart';
 import 'update/update_service.dart';
-import 'window/focus_tint.dart';
 import 'window/window_placement.dart';
 
-final bool _isDesktop = Platform.isMacOS || Platform.isWindows || Platform.isLinux;
+final bool _isDesktop =
+    Platform.isMacOS || Platform.isWindows || Platform.isLinux;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +58,32 @@ Future<void> main() async {
   // 데스크톱이 아니거나 UPDATE_SERVER 가 비어 있으면 null — 업데이트 확인 없음.
   final updates = await UpdateService.create();
   // UpdateScope 는 MaterialApp 위에 둔다 — 정보 창이 이것을 읽어 "업데이트 확인" 단추를 붙인다.
-  runApp(UpdateScope(service: updates, child: App(settings: settings, updates: updates)));
+
+  // 프로젝트 목록과 앱 설정은 앱 데이터 폴더의 JSON 파일에 저장한다 (identity.md §6).
+  final dataDir = appDataDirectory(
+    fileName: AppIdentity.displayName.replaceAll(' ', ''),
+  );
+  final projectStore = FileProjectStore(
+    JsonFileStore(File('${dataDir.path}/projects.json')),
+  );
+  final configStore = FileAppConfigStore(
+    JsonFileStore(File('${dataDir.path}/app_settings.json')),
+  );
+  final config = await configStore.load();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        projectStoreProvider.overrideWithValue(projectStore),
+        appConfigStoreProvider.overrideWithValue(configStore),
+        appConfigProvider.overrideWith(() => AppConfigNotifier(config)),
+      ],
+      child: UpdateScope(
+        service: updates,
+        child: App(settings: settings, updates: updates),
+      ),
+    ),
+  );
 }
 
 class App extends StatefulWidget {
@@ -93,7 +124,8 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     final brightness = switch (widget.settings.themeMode) {
       ThemeMode.light => Brightness.light,
       ThemeMode.dark => Brightness.dark,
-      ThemeMode.system => WidgetsBinding.instance.platformDispatcher.platformBrightness,
+      ThemeMode.system =>
+        WidgetsBinding.instance.platformDispatcher.platformBrightness,
     };
     windowManager.setBrightness(brightness);
   }
@@ -106,7 +138,9 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       context,
       tagline: l10n.aboutTagline,
       description: l10n.aboutDescription,
-      onCheckForUpdates: widget.updates == null ? null : () => widget.updates!.checkManually(context),
+      onCheckForUpdates: widget.updates == null
+          ? null
+          : () => widget.updates!.checkManually(context),
     );
   }
 
@@ -137,49 +171,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             onCheckForUpdates: widget.updates == null ? null : _checkForUpdates,
             child: child!,
           ),
-          home: HomeScreen(onAbout: _showAbout),
-        ),
-      ),
-    );
-  }
-}
-
-/// 기능이 들어오기 전의 자리 표시 화면 — 빈 상태 패턴 (ui-ux.md §6).
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, required this.onAbout});
-
-  final VoidCallback onAbout;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: const FocusTint(),
-        title: const Text(AppIdentity.displayName),
-        actions: [
-          const ThemeMenuButton(),
-          const LanguageMenuButton(),
-          IconButton(
-            tooltip: l10n.aboutTooltip,
-            icon: const Icon(Icons.info_outline_rounded),
-            onPressed: onAbout,
-          ),
-          const SizedBox(width: AppSpacing.sm),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(AppIdentity.iconAsset, width: 48, height: 48),
-            const SizedBox(height: AppSpacing.lg),
-            Text(l10n.homeEmptyTitle, style: theme.textTheme.titleMedium),
-            const SizedBox(height: AppSpacing.lg),
-            // 기능이 생기면 주 행동을 연결한다. 그 전까지는 비활성.
-            FilledButton(onPressed: null, child: Text(l10n.homeEmptyAction)),
-          ],
+          home: ProjectListScreen(onAbout: _showAbout),
         ),
       ),
     );

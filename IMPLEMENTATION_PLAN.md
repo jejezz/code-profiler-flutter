@@ -358,7 +358,7 @@ abstract interface class ProcessRunner {
 | `open(profile, location)` | Local: `code --profile <p> <path>` / SSH: `code --profile <p> --remote ssh-remote+<host> <path>` |
 
 - `code` 실행 파일 경로는 설정값. 기본값은 OS별 탐색 결과(PATH의 `code`, macOS `/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code`, Linux `/snap/bin/code`, `/usr/bin/code`).
-- Windows는 `runInShell: true`.
+- Windows의 `code.cmd`는 셸 없이 직접 실행한다(`runInShell: true`는 공백이 든 경로+인자 조합에서 `cmd`가 따옴표를 벗겨 깨짐). 배치 파일 인자의 셸 특수문자는 거부한다.
 - 확장 설치는 이미 설치된 확장을 `listExtensions`로 확인해 건너뛴다.
 
 ### 5.3 원격 실행 (`remote/`)
@@ -412,7 +412,7 @@ profile-engine apply-settings <path> --patch <json-file> [--replace-conflicts ke
 ### 7.2 상태와 저장
 
 - Riverpod provider: `projectsProvider`(목록, 저장 포함), `engineProvider`(엔진 인스턴스), `vscodeCliProvider`, `settingsProvider`
-- 저장: `getApplicationSupportDirectory()/projects.json`, `app_settings.json`
+- 저장: 앱 데이터 폴더(규약 identity.md §6, `path_provider` 미사용)의 `projects.json`, `app_settings.json`
 - 저장 형식에 `schemaVersion`을 넣는다
 
 ### 7.3 `~/.ssh/config` 호스트 목록
@@ -447,7 +447,7 @@ profile-engine apply-settings <path> --patch <json-file> [--replace-conflicts ke
 - 병합: 표 4.2의 네 경우, 중첩 Map, List 중복 제거
 - 변수 치환: 해석 성공, 미해석 시 항목 제거 + 경고, 예약 변수 보존
 - 규칙 로딩: 스키마 오류 메시지(줄 번호 포함), 사용자 규칙 덮어쓰기
-- VsCodeCli: FakeProcessRunner로 인자 구성 검증(로컬/SSH, Windows runInShell)
+- VsCodeCli: FakeProcessRunner로 인자 구성 검증(로컬/SSH, Windows 배치 파일)
 - shellQuote: 공백, 작은따옴표, `$`, 백틱
 
 ---
@@ -533,16 +533,18 @@ macOS entitlements(샌드박스 해제, `com.apple.security.app-sandbox: false`)
 - [x] 6장의 엔진 CLI 명령 전부
 - [x] `dart compile exe` 빌드 확인
 
-구현 메모: Windows에서 셸(`runInShell`)을 거칠 때는 인자에 `& | < > ^ % " `` 줄바꿈`이 있으면 실행하지 않고 오류로 돌려준다. 통합 테스트는 `dart_test.yaml`로 기본 제외(`dart test -t integration --run-skipped`). 종료 코드 4는 설정 파일 처리 실패(기존 settings.json이 잘못된 경우 포함)를 뜻하고, `diff-settings`도 `--replace-conflicts`를 받아 선택을 반영한 미리보기를 만든다.
+구현 메모: Windows 배치 파일(`code.cmd`)이나 셸을 거칠 때는 인자에 `& | < > ^ % " `` 줄바꿈`이 있으면 실행하지 않고 오류로 돌려준다. 프로세스 출력은 UTF-8, 실패 시 시스템 인코딩으로 읽는다. 통합 테스트는 `dart_test.yaml`로 기본 제외(`dart test -t integration --run-skipped`). 종료 코드 4는 설정 파일 처리 실패(기존 settings.json이 잘못된 경우 포함)를 뜻하고, `diff-settings`도 `--replace-conflicts`를 받아 선택을 반영한 미리보기를 만든다.
 
 **완료 기준**: FakeProcessRunner 기반 테스트 통과. 컴파일된 실행 파일로 `analyze <픽스처> --json`이 올바른 JSON 출력.
 
 ### Phase 5 — 앱: 로컬 프로젝트
 
-- [ ] 프로젝트 목록·추가(폴더 선택, 드래그 앤 드롭)·저장
-- [ ] 분석 결과, 추천 편집, 설정 diff, 적용 진행 화면
-- [ ] 열기 버튼
-- [ ] 설정 화면(code 경로)
+- [x] 프로젝트 목록·추가(폴더 선택, 드래그 앤 드롭)·저장
+- [x] 분석 결과, 추천 편집, 설정 diff, 적용 진행 화면
+- [x] 열기 버튼
+- [x] 설정 화면(code 경로)
+
+구현 메모: 상태 관리는 `flutter_riverpod` 3.x. 화면은 엔진을 직접 부르지 않고 `ProjectService`(로컬 구현 `LocalProjectService`)만 쓴다 — Phase 6에서 SSH 구현을 같은 인터페이스에 붙인다. 저장은 `path_provider` 대신 규약(identity.md §6)의 앱 데이터 폴더(`%APPDATA%\CodeProfiler`, macOS `~/Library/Application Support/CodeProfiler`, Linux `${XDG_CONFIG_HOME:-~/.config}/CodeProfiler`)에 `projects.json`·`app_settings.json`으로 한다. `desktop_drop 0.6.1`은 `file_picker 13`과 `cross_file` 버전이 맞는 조합이다(0.9 이상은 충돌). 프로젝트 추가는 폴더 선택 또는 창 드롭이며, SSH 입력은 Phase 6에서 더한다.
 
 **완료 기준**: 로컬 ESP-IDF·Gradle 샘플 프로젝트로 등록 → 분석 → 추천 → 적용 → VS Code가 해당 프로필로 열림을 수동 확인. 위젯 테스트로 목록·diff 화면 기본 동작 검증.
 

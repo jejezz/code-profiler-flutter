@@ -191,4 +191,323 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get updateBusyBody =>
       'A task is in progress. Please try again when it has finished.';
+
+  @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get commonDelete => 'Delete';
+
+  @override
+  String get commonRetry => 'Retry';
+
+  @override
+  String get commonCopy => 'Copy';
+
+  @override
+  String get appSettingsTooltip => 'Settings';
+
+  @override
+  String get projectAdd => 'Add project';
+
+  @override
+  String get projectPickFolderTitle => 'Choose a project folder';
+
+  @override
+  String get projectDropHere => 'Drop to add a project';
+
+  @override
+  String projectDropNotFolder(String name) {
+    return 'Only folders can be added: $name';
+  }
+
+  @override
+  String get projectOpen => 'Open in VS Code';
+
+  @override
+  String get projectOpenNeedsProfile =>
+      'Analyze the project and apply the settings first';
+
+  @override
+  String get projectAnalyze => 'Analyze & recommend';
+
+  @override
+  String get projectRemove => 'Remove from list';
+
+  @override
+  String get projectRemoveTitle => 'Remove this project from the list?';
+
+  @override
+  String projectRemoveBody(String name) {
+    return '$name is only removed from the list. The folder and its files are left untouched.';
+  }
+
+  @override
+  String get projectNoAnalysis => 'Not analyzed';
+
+  @override
+  String get projectNoProfile => 'No profile';
+
+  @override
+  String projectLastOpened(String date) {
+    return 'Last opened $date';
+  }
+
+  @override
+  String get projectNeverOpened => 'Never opened';
+
+  @override
+  String projectLoadError(String message) {
+    return 'Could not read the project list: $message';
+  }
+
+  @override
+  String get projectLocal => 'Local';
+
+  @override
+  String openFailed(String message) {
+    return 'Could not open VS Code: $message';
+  }
+
+  @override
+  String get analysisTitle => 'Analysis';
+
+  @override
+  String get analysisRunning => 'Analyzing the folder…';
+
+  @override
+  String get analysisFailed => 'The analysis failed';
+
+  @override
+  String get analysisNoTypes =>
+      'No project type was detected. Check the folder contents or add a user rule.';
+
+  @override
+  String get analysisPrimaryBadge => 'Primary';
+
+  @override
+  String analysisPriority(String value) {
+    return 'Priority $value';
+  }
+
+  @override
+  String get analysisCompetitorsTitle => 'Close competitors';
+
+  @override
+  String analysisCompetitorsBody(String names) {
+    return '$names also matched with a similar priority but uses a different profile. You can switch on the next screen.';
+  }
+
+  @override
+  String analysisStats(String count) {
+    return '$count files scanned';
+  }
+
+  @override
+  String get analysisTruncated =>
+      'The scan stopped at the file limit. Opening only the module folder you work in is recommended.';
+
+  @override
+  String analysisSkippedDirs(String names) {
+    return 'Folders not entered: $names';
+  }
+
+  @override
+  String get analysisVariables => 'Resolved variables';
+
+  @override
+  String get analysisNext => 'View recommendation';
+
+  @override
+  String get recommendTitle => 'Edit recommendation';
+
+  @override
+  String get recommendPrimaryType => 'Primary type';
+
+  @override
+  String get recommendProfile => 'Profile name';
+
+  @override
+  String get recommendProfileHelp =>
+      'The VS Code profile name. It is created if it does not exist.';
+
+  @override
+  String get recommendProfileSuggestions => 'Suggested names';
+
+  @override
+  String get recommendProfileEmpty => 'Enter a profile name';
+
+  @override
+  String get recommendProfileInvalid =>
+      'The profile name contains a character that is not allowed';
+
+  @override
+  String get recommendExtensionsRequired => 'Recommended extensions';
+
+  @override
+  String get recommendExtensionsOptional => 'Optional extensions (other types)';
+
+  @override
+  String get recommendSettings => 'Settings patch';
+
+  @override
+  String recommendSettingsCount(String count) {
+    return '$count entries';
+  }
+
+  @override
+  String get recommendNotes => 'Notes';
+
+  @override
+  String get recommendNone => 'There is nothing to recommend';
+
+  @override
+  String get recommendNext => 'Compare settings';
+
+  @override
+  String get diffTitle => 'Compare settings';
+
+  @override
+  String get diffLoading => 'Comparing…';
+
+  @override
+  String get diffFailed => 'Could not compare';
+
+  @override
+  String get diffNewFile => 'settings.json will be created.';
+
+  @override
+  String get diffNoChange => 'settings.json will not change.';
+
+  @override
+  String get diffCommentsWarning =>
+      'Comments in the existing settings.json will be lost. A .bak backup is made before applying.';
+
+  @override
+  String diffAdded(String count) {
+    return 'Added ($count)';
+  }
+
+  @override
+  String diffConflicts(String count) {
+    return 'Conflicts — existing value kept ($count)';
+  }
+
+  @override
+  String diffUnchanged(String count) {
+    return 'Unchanged ($count)';
+  }
+
+  @override
+  String get diffReplace => 'Replace with the patch value';
+
+  @override
+  String get diffExisting => 'Existing';
+
+  @override
+  String get diffPatch => 'Patch';
+
+  @override
+  String get diffMergedPreview => 'File after applying';
+
+  @override
+  String get diffApply => 'Apply';
+
+  @override
+  String get applyTitle => 'Apply';
+
+  @override
+  String get applyStepExtensions => 'Install extensions';
+
+  @override
+  String get applyStepSettings => 'Write settings';
+
+  @override
+  String get applyNoExtensions => 'There are no extensions to install.';
+
+  @override
+  String applyExtSkipped(String id) {
+    return 'Already installed: $id';
+  }
+
+  @override
+  String applyExtInstalling(String id) {
+    return 'Installing: $id';
+  }
+
+  @override
+  String applyExtFailed(String id, String code) {
+    return 'Install failed: $id (exit code $code)';
+  }
+
+  @override
+  String get applySettingsWritten => 'settings.json was updated.';
+
+  @override
+  String applySettingsBackup(String path) {
+    return 'Backup: $path';
+  }
+
+  @override
+  String get applySettingsUnchanged =>
+      'Nothing changed, so the file was not written.';
+
+  @override
+  String get applyDone => 'Applied successfully';
+
+  @override
+  String applyFailedStep(String step, String message) {
+    return 'Failed at “$step”: $message';
+  }
+
+  @override
+  String applySaveFailed(String message) {
+    return 'Could not save the project: $message';
+  }
+
+  @override
+  String get applyBackToList => 'Back to list';
+
+  @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsCodePath => 'VS Code executable (code) path';
+
+  @override
+  String get settingsCodePathHint => 'Leave empty to detect it automatically';
+
+  @override
+  String get settingsDetect => 'Detect';
+
+  @override
+  String get settingsBrowse => 'Browse';
+
+  @override
+  String get settingsTest => 'Check';
+
+  @override
+  String get settingsSave => 'Save';
+
+  @override
+  String settingsDetected(String path) {
+    return 'Found: $path';
+  }
+
+  @override
+  String get settingsNotFound =>
+      'VS Code was not found. Set the path yourself.';
+
+  @override
+  String settingsTestOk(String version) {
+    return 'VS Code $version';
+  }
+
+  @override
+  String settingsTestFailed(String message) {
+    return 'Could not run it: $message';
+  }
+
+  @override
+  String get settingsSaved => 'Saved';
 }

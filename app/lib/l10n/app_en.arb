@@ -123,5 +123,254 @@
   },
   "updateQuitAndInstall": "Quit and install",
   "updateBusyTitle": "Can't update right now",
-  "updateBusyBody": "A task is in progress. Please try again when it has finished."
+  "updateBusyBody": "A task is in progress. Please try again when it has finished.",
+  "commonCancel": "Cancel",
+  "commonDelete": "Delete",
+  "commonRetry": "Retry",
+  "commonCopy": "Copy",
+  "appSettingsTooltip": "Settings",
+  "projectAdd": "Add project",
+  "projectPickFolderTitle": "Choose a project folder",
+  "projectDropHere": "Drop to add a project",
+  "projectDropNotFolder": "Only folders can be added: {name}",
+  "@projectDropNotFolder": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "projectOpen": "Open in VS Code",
+  "projectOpenNeedsProfile": "Analyze the project and apply the settings first",
+  "projectAnalyze": "Analyze & recommend",
+  "projectRemove": "Remove from list",
+  "projectRemoveTitle": "Remove this project from the list?",
+  "projectRemoveBody": "{name} is only removed from the list. The folder and its files are left untouched.",
+  "@projectRemoveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "projectNoAnalysis": "Not analyzed",
+  "projectNoProfile": "No profile",
+  "projectLastOpened": "Last opened {date}",
+  "@projectLastOpened": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "projectNeverOpened": "Never opened",
+  "projectLoadError": "Could not read the project list: {message}",
+  "@projectLoadError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "projectLocal": "Local",
+  "openFailed": "Could not open VS Code: {message}",
+  "@openFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTitle": "Analysis",
+  "analysisRunning": "Analyzing the folder…",
+  "analysisFailed": "The analysis failed",
+  "analysisNoTypes": "No project type was detected. Check the folder contents or add a user rule.",
+  "analysisPrimaryBadge": "Primary",
+  "analysisPriority": "Priority {value}",
+  "@analysisPriority": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCompetitorsTitle": "Close competitors",
+  "analysisCompetitorsBody": "{names} also matched with a similar priority but uses a different profile. You can switch on the next screen.",
+  "@analysisCompetitorsBody": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisStats": "{count} files scanned",
+  "@analysisStats": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTruncated": "The scan stopped at the file limit. Opening only the module folder you work in is recommended.",
+  "analysisSkippedDirs": "Folders not entered: {names}",
+  "@analysisSkippedDirs": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisVariables": "Resolved variables",
+  "analysisNext": "View recommendation",
+  "recommendTitle": "Edit recommendation",
+  "recommendPrimaryType": "Primary type",
+  "recommendProfile": "Profile name",
+  "recommendProfileHelp": "The VS Code profile name. It is created if it does not exist.",
+  "recommendProfileSuggestions": "Suggested names",
+  "recommendProfileEmpty": "Enter a profile name",
+  "recommendProfileInvalid": "The profile name contains a character that is not allowed",
+  "recommendExtensionsRequired": "Recommended extensions",
+  "recommendExtensionsOptional": "Optional extensions (other types)",
+  "recommendSettings": "Settings patch",
+  "recommendSettingsCount": "{count} entries",
+  "@recommendSettingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "recommendNotes": "Notes",
+  "recommendNone": "There is nothing to recommend",
+  "recommendNext": "Compare settings",
+  "diffTitle": "Compare settings",
+  "diffLoading": "Comparing…",
+  "diffFailed": "Could not compare",
+  "diffNewFile": "settings.json will be created.",
+  "diffNoChange": "settings.json will not change.",
+  "diffCommentsWarning": "Comments in the existing settings.json will be lost. A .bak backup is made before applying.",
+  "diffAdded": "Added ({count})",
+  "@diffAdded": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "diffConflicts": "Conflicts — existing value kept ({count})",
+  "@diffConflicts": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "diffUnchanged": "Unchanged ({count})",
+  "@diffUnchanged": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "diffReplace": "Replace with the patch value",
+  "diffExisting": "Existing",
+  "diffPatch": "Patch",
+  "diffMergedPreview": "File after applying",
+  "diffApply": "Apply",
+  "applyTitle": "Apply",
+  "applyStepExtensions": "Install extensions",
+  "applyStepSettings": "Write settings",
+  "applyNoExtensions": "There are no extensions to install.",
+  "applyExtSkipped": "Already installed: {id}",
+  "@applyExtSkipped": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "applyExtInstalling": "Installing: {id}",
+  "@applyExtInstalling": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "applyExtFailed": "Install failed: {id} (exit code {code})",
+  "@applyExtFailed": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "applySettingsWritten": "settings.json was updated.",
+  "applySettingsBackup": "Backup: {path}",
+  "@applySettingsBackup": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "applySettingsUnchanged": "Nothing changed, so the file was not written.",
+  "applyDone": "Applied successfully",
+  "applyFailedStep": "Failed at “{step}”: {message}",
+  "@applyFailedStep": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "applySaveFailed": "Could not save the project: {message}",
+  "@applySaveFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "applyBackToList": "Back to list",
+  "settingsTitle": "Settings",
+  "settingsCodePath": "VS Code executable (code) path",
+  "settingsCodePathHint": "Leave empty to detect it automatically",
+  "settingsDetect": "Detect",
+  "settingsBrowse": "Browse",
+  "settingsTest": "Check",
+  "settingsSave": "Save",
+  "settingsDetected": "Found: {path}",
+  "@settingsDetected": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsNotFound": "VS Code was not found. Set the path yourself.",
+  "settingsTestOk": "VS Code {version}",
+  "@settingsTestOk": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTestFailed": "Could not run it: {message}",
+  "@settingsTestFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSaved": "Saved"
 }

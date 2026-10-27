@@ -140,5 +140,254 @@
   },
   "updateQuitAndInstall": "종료하고 설치",
   "updateBusyTitle": "지금은 업데이트할 수 없습니다",
-  "updateBusyBody": "작업이 진행 중입니다. 끝난 뒤에 다시 시도해 주세요."
+  "updateBusyBody": "작업이 진행 중입니다. 끝난 뒤에 다시 시도해 주세요.",
+  "commonCancel": "취소",
+  "commonDelete": "삭제",
+  "commonRetry": "다시 시도",
+  "commonCopy": "복사",
+  "appSettingsTooltip": "설정",
+  "projectAdd": "프로젝트 추가",
+  "projectPickFolderTitle": "프로젝트 폴더 선택",
+  "projectDropHere": "여기에 놓아 프로젝트 추가",
+  "projectDropNotFolder": "폴더만 추가할 수 있습니다: {name}",
+  "@projectDropNotFolder": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "projectOpen": "VS Code로 열기",
+  "projectOpenNeedsProfile": "먼저 분석하고 설정을 적용하세요",
+  "projectAnalyze": "분석 · 추천",
+  "projectRemove": "목록에서 제거",
+  "projectRemoveTitle": "프로젝트를 목록에서 제거할까요?",
+  "projectRemoveBody": "{name} 은(는) 목록에서만 지워지고, 폴더와 파일은 그대로 남습니다.",
+  "@projectRemoveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "projectNoAnalysis": "분석 전",
+  "projectNoProfile": "프로필 없음",
+  "projectLastOpened": "마지막 열기 {date}",
+  "@projectLastOpened": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "projectNeverOpened": "열어 본 적 없음",
+  "projectLoadError": "프로젝트 목록을 읽지 못했습니다: {message}",
+  "@projectLoadError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "projectLocal": "로컬",
+  "openFailed": "VS Code를 열지 못했습니다: {message}",
+  "@openFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTitle": "분석 결과",
+  "analysisRunning": "폴더를 분석하는 중…",
+  "analysisFailed": "분석에 실패했습니다",
+  "analysisNoTypes": "판정된 프로젝트 유형이 없습니다. 폴더 구성을 확인하거나 사용자 규칙을 추가하세요.",
+  "analysisPrimaryBadge": "주 유형",
+  "analysisPriority": "우선순위 {value}",
+  "@analysisPriority": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisCompetitorsTitle": "근접 경쟁 후보",
+  "analysisCompetitorsBody": "{names} 도 비슷한 우선순위로 맞았지만 다른 프로필을 씁니다. 추천 편집 화면에서 바꿀 수 있습니다.",
+  "@analysisCompetitorsBody": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisStats": "스캔한 파일 {count}개",
+  "@analysisStats": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisTruncated": "파일 수 상한에서 스캔을 멈췄습니다. 작업 모듈 폴더만 여는 것을 권장합니다.",
+  "analysisSkippedDirs": "들어가지 않은 폴더: {names}",
+  "@analysisSkippedDirs": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisVariables": "해석된 변수",
+  "analysisNext": "추천 보기",
+  "recommendTitle": "추천 편집",
+  "recommendPrimaryType": "주 유형",
+  "recommendProfile": "프로필 이름",
+  "recommendProfileHelp": "VS Code 프로필 이름입니다. 없으면 새로 만들어집니다.",
+  "recommendProfileSuggestions": "추천 이름",
+  "recommendProfileEmpty": "프로필 이름을 입력하세요",
+  "recommendProfileInvalid": "프로필 이름에 쓸 수 없는 문자가 있습니다",
+  "recommendExtensionsRequired": "추천 확장",
+  "recommendExtensionsOptional": "선택 확장 (다른 유형)",
+  "recommendSettings": "설정 패치",
+  "recommendSettingsCount": "{count}개 항목",
+  "@recommendSettingsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "recommendNotes": "안내",
+  "recommendNone": "추천할 내용이 없습니다",
+  "recommendNext": "설정 비교",
+  "diffTitle": "설정 비교",
+  "diffLoading": "비교하는 중…",
+  "diffFailed": "비교하지 못했습니다",
+  "diffNewFile": "settings.json 이 새로 만들어집니다.",
+  "diffNoChange": "settings.json 은 바뀌지 않습니다.",
+  "diffCommentsWarning": "기존 settings.json 의 주석이 사라집니다. 적용하기 전에 .bak 백업이 만들어집니다.",
+  "diffAdded": "추가 ({count})",
+  "@diffAdded": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "diffConflicts": "충돌 — 기존 값 유지 ({count})",
+  "@diffConflicts": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "diffUnchanged": "변경 없음 ({count})",
+  "@diffUnchanged": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "diffReplace": "패치 값으로 교체",
+  "diffExisting": "기존",
+  "diffPatch": "패치",
+  "diffMergedPreview": "적용 후 파일 내용",
+  "diffApply": "적용",
+  "applyTitle": "적용",
+  "applyStepExtensions": "확장 설치",
+  "applyStepSettings": "설정 쓰기",
+  "applyNoExtensions": "설치할 확장이 없습니다.",
+  "applyExtSkipped": "이미 설치됨: {id}",
+  "@applyExtSkipped": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "applyExtInstalling": "설치 중: {id}",
+  "@applyExtInstalling": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "applyExtFailed": "설치 실패: {id} (종료 코드 {code})",
+  "@applyExtFailed": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "applySettingsWritten": "settings.json 을 갱신했습니다.",
+  "applySettingsBackup": "백업: {path}",
+  "@applySettingsBackup": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "applySettingsUnchanged": "바뀐 내용이 없어 파일을 쓰지 않았습니다.",
+  "applyDone": "적용을 마쳤습니다",
+  "applyFailedStep": "{step} 단계에서 실패했습니다: {message}",
+  "@applyFailedStep": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "applySaveFailed": "프로젝트 정보를 저장하지 못했습니다: {message}",
+  "@applySaveFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "applyBackToList": "목록으로",
+  "settingsTitle": "설정",
+  "settingsCodePath": "VS Code 실행 파일(code) 경로",
+  "settingsCodePathHint": "비워 두면 자동으로 찾습니다",
+  "settingsDetect": "자동 탐지",
+  "settingsBrowse": "찾아보기",
+  "settingsTest": "확인",
+  "settingsSave": "저장",
+  "settingsDetected": "찾은 경로: {path}",
+  "@settingsDetected": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsNotFound": "VS Code를 찾지 못했습니다. 경로를 직접 지정하세요.",
+  "settingsTestOk": "VS Code {version}",
+  "@settingsTestOk": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsTestFailed": "실행하지 못했습니다: {message}",
+  "@settingsTestFailed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSaved": "저장했습니다"
 }
