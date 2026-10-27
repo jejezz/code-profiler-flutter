@@ -5,7 +5,7 @@
 
 릴리스·버전·패키징·정보 창·아이콘·라이선스·UI/UX·글꼴·언어·테마는
 https://github.com/jejezz/application-release-templates/tree/main/conventions
-규약을 따른다. 이 앱에 적용된 규약 버전: conventions-v1 (미적용: 아이콘 소품 글리프(임시), README 본문)
+규약을 따른다. 이 앱에 적용된 규약 버전: conventions-v1 (미적용: README 본문)
 
 ### 앱 정체성 (identity.md 기준, 한 번 정하면 릴리스 후 bundle id/AppId는 바꾸지 않음)
 
