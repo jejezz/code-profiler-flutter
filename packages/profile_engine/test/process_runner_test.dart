@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:profile_engine/profile_engine.dart';
@@ -30,6 +31,33 @@ void main() {
     final r = await runner.run(dart, [s]);
     expect(r.stdout, '한글 ✓');
     expect(r.ok, isTrue);
+  });
+
+  group('decodeProcessOutput', () {
+    test('valid UTF-8 is decoded as UTF-8', () {
+      expect(decodeProcessOutput(utf8.encode('한글 ✓ ok')), '한글 ✓ ok');
+    });
+
+    test('invalid UTF-8 falls back to the given encoding', () {
+      // 0xE9 is "é" in Latin-1 but an incomplete sequence in UTF-8.
+      expect(decodeProcessOutput([0x61, 0xE9], fallback: latin1), 'aé');
+    });
+
+    test('never throws, even when the fallback cannot decode it either', () {
+      const strict = AsciiCodec(allowInvalid: false);
+      expect(decodeProcessOutput([0xFF, 0xFE], fallback: strict), isNotEmpty);
+    });
+
+    test('empty input is empty', () {
+      expect(decodeProcessOutput(const []), '');
+    });
+  });
+
+  test('start: multi-byte lines survive intact, CRLF is trimmed', () async {
+    final s = script("void main() { stdout.write('한글 하나\\r\\n둘 ✓\\n마지막'); }");
+    final events = await runner.start(dart, [s]).toList();
+    final lines = events.whereType<OutputLine>().map((l) => l.line).toList();
+    expect(lines, ['한글 하나', '둘 ✓', '마지막']);
   });
 
   test('run: a missing executable is a startError, not an exception', () async {

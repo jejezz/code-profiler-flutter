@@ -27,7 +27,8 @@ export 'src/settings/settings_file.dart'
 export 'src/process/fake_process_runner.dart'
     show FakeProcessRunner, ProcessCall;
 export 'src/process/process_runner.dart';
-export 'src/process/system_process_runner.dart' show SystemProcessRunner;
+export 'src/process/system_process_runner.dart'
+    show SystemProcessRunner, decodeProcessOutput;
 export 'src/version.dart' show engineVersion;
 export 'src/vscode/code_locator.dart' show discoverCodePath;
 export 'src/vscode/vscode_cli.dart';

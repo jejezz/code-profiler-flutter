@@ -40,17 +40,35 @@ final class InstallFinished extends InstallEvent {
 
 /// VS Code CLI(`code`) 래퍼. 프로필 생성·확장 설치·열기는 이 CLI로만 한다.
 ///
-/// Windows의 `code`는 `code.cmd`라서 셸을 거쳐야 한다. 셸을 거칠 때는 인자 속
-/// 셸 특수문자가 해석되지 않도록, 그런 문자가 든 인자를 거부한다.
+/// Windows의 `code`는 `code.cmd`(배치 파일)다. `runInShell: true`로 실행하면 Dart가
+/// 공백이 든 경로와 인자를 따옴표로 감싸고, `cmd /c`가 따옴표가 여러 개인 명령줄의 바깥
+/// 따옴표를 벗겨 버려 "경로에 공백이 있는 설치 + 공백이 든 프로필 이름" 조합이 깨진다.
+/// 그래서 셸 없이 직접 실행한다(Windows가 배치 파일은 스스로 `cmd`로 실행한다).
+///
+/// 배치 파일은 어느 쪽이든 `cmd`가 인자를 해석하므로, 인자 속 셸 특수문자(`&`, `|` 등)를
+/// 거부한다.
 class VsCodeCli {
   final ProcessRunner _runner;
 
   /// `code` 실행 파일 경로. 사용자가 설정에서 바꿀 수 있다.
   final String codePath;
   final bool _runInShell;
+  final bool _isWindows;
 
-  VsCodeCli(this._runner, {this.codePath = 'code', bool? runInShell})
-    : _runInShell = runInShell ?? Platform.isWindows;
+  /// [runInShell]은 기본값 false다(위 설명). [isWindows]는 테스트에서 바꿀 수 있다.
+  VsCodeCli(
+    this._runner, {
+    this.codePath = 'code',
+    bool? runInShell,
+    bool? isWindows,
+  }) : _runInShell = runInShell ?? false,
+       _isWindows = isWindows ?? Platform.isWindows;
+
+  /// 인자가 `cmd`에 해석될 수 있는 실행 방식인지(셸을 거치거나 Windows 배치 파일).
+  bool get _argsReachCmd =>
+      _runInShell ||
+      (_isWindows &&
+          RegExp(r'\.(cmd|bat)$', caseSensitive: false).hasMatch(codePath));
 
   static const _shellMeta = [
     '&',
@@ -168,7 +186,7 @@ class VsCodeCli {
       _runner.run(codePath, args, timeout: timeout, runInShell: _runInShell);
 
   EngineError? _checkArgs(List<String> args) {
-    if (!_runInShell) return null;
+    if (!_argsReachCmd) return null;
     for (final a in args) {
       if (_shellMeta.any(a.contains)) {
         return EngineError("셸 특수문자가 들어 있어 VS Code에 넘길 수 없습니다: '$a'");

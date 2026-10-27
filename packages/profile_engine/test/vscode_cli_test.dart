@@ -169,6 +169,83 @@ void main() {
     );
   });
 
+  group('Windows batch file (code.cmd)', () {
+    const codeCmd =
+        r'C:\Users\me\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd';
+
+    VsCodeCli cli(
+      FakeProcessRunner fake, {
+      String path = codeCmd,
+      bool windows = true,
+    }) => VsCodeCli(fake, codePath: path, isWindows: windows);
+
+    test(
+      'runs without a shell, so spaces in the path and the profile survive',
+      () async {
+        final fake = FakeProcessRunner()..onArgs(['--profile']);
+        final r = await cli(fake)
+            .open('Web / Python', const LocalLocation(r'C:\My Work\app'));
+        expect(r.isOk, isTrue);
+        final call = fake.calls.single;
+        expect(call.runInShell, isFalse);
+        expect(call.executable, codeCmd);
+        expect(call.args, ['--profile', 'Web / Python', r'C:\My Work\app']);
+      },
+    );
+
+    test('list and install also skip the shell', () async {
+      final fake = FakeProcessRunner()..onArgs(['--profile']);
+      final c = cli(fake);
+      await c.listExtensions('C++ AOSP');
+      await c.installExtension('C++ AOSP', 'a.b').toList();
+      expect(fake.calls.map((call) => call.runInShell), [false, false]);
+    });
+
+    test('cmd metacharacters are still refused for batch files', () async {
+      final fake = FakeProcessRunner()..onArgs(['--profile']);
+      final c = cli(fake);
+      expect(
+        (await c.open('P', const LocalLocation(r'C:\a&calc'))).isOk,
+        isFalse,
+      );
+      expect((await c.listExtensions('P|Q')).isOk, isFalse);
+      expect(fake.calls, isEmpty);
+    });
+
+    test('uppercase and .bat are batch files too', () async {
+      final fake = FakeProcessRunner()..onArgs(['--profile']);
+      for (final path in [
+        r'C:\VS\bin\CODE.CMD',
+        r'C:\VS\bin\code.bat',
+        'code.cmd',
+      ]) {
+        final r = await cli(
+          fake,
+          path: path,
+        ).open('P', const LocalLocation('a&b'));
+        expect(r.isOk, isFalse, reason: path);
+      }
+    });
+
+    test(
+      'a real executable is not guarded, nor is any path off Windows',
+      () async {
+        final fake = FakeProcessRunner()..onArgs(['--profile']);
+        final exe = await cli(
+          fake,
+          path: r'C:\VS\Code.exe',
+        ).open('P', const LocalLocation('a&b'));
+        expect(exe.isOk, isTrue);
+        final posix = await cli(
+          fake,
+          path: '/opt/code.cmd',
+          windows: false,
+        ).open('P', const LocalLocation('a&b'));
+        expect(posix.isOk, isTrue);
+      },
+    );
+  });
+
   group('installExtensions', () {
     test('skips installed extensions, streams the rest', () async {
       final fake = FakeProcessRunner()
