@@ -24,3 +24,10 @@ export 'src/settings/merge.dart'
         mergeSettings;
 export 'src/settings/settings_file.dart'
     show SettingsWriteResult, applySettingsFile, diffSettingsFile;
+export 'src/process/fake_process_runner.dart'
+    show FakeProcessRunner, ProcessCall;
+export 'src/process/process_runner.dart';
+export 'src/process/system_process_runner.dart' show SystemProcessRunner;
+export 'src/version.dart' show engineVersion;
+export 'src/vscode/code_locator.dart' show discoverCodePath;
+export 'src/vscode/vscode_cli.dart';

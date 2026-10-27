@@ -1,0 +1,5 @@
+# 실제 VS Code나 SSH 서버가 필요한 테스트는 @Tags(['integration'])을 붙이고 기본 실행에서 제외한다.
+# 실행: dart test -t integration --run-skipped
+tags:
+  integration:
+    skip: "실제 VS Code/SSH가 필요합니다. dart test -t integration --run-skipped 로 실행하세요."

@@ -28,6 +28,14 @@ final class SettingChange {
     this.patch,
     this.replaced = false,
   });
+
+  Map<String, Object?> toJson() => {
+    'pointer': pointer,
+    'kind': kind.name,
+    'existing': existing,
+    'patch': patch,
+    'replaced': replaced,
+  };
 }
 
 final class MergeResult {
@@ -196,6 +204,14 @@ final class SettingsDiff {
     for (final c in changes)
       if (c.kind == ChangeKind.conflict) c,
   ];
+
+  Map<String, Object?> toJson() => {
+    'changes': [for (final c in changes) c.toJson()],
+    'mergedJson': mergedJson,
+    'commentsWillBeLost': commentsWillBeLost,
+    'existingFile': existingFile,
+    'hasChanges': hasChanges,
+  };
 
   /// 파일에 실제로 써야 할 변화가 있는지(추가되었거나 교체된 충돌이 있는지).
   bool get hasChanges => changes.any(

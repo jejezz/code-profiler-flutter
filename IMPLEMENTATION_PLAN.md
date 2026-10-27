@@ -385,11 +385,11 @@ abstract interface class ProcessRunner {
 profile-engine --version
 profile-engine analyze <path> [--rules <file>] --json
 profile-engine recommend <path> [--rules <file>] --json        # analyze + recommend
-profile-engine diff-settings <path> --patch <json-file> --json  # 쓰지 않고 diff만
+profile-engine diff-settings <path> --patch <json-file> [--replace-conflicts p1,p2] --json  # 쓰지 않고 diff만
 profile-engine apply-settings <path> --patch <json-file> [--replace-conflicts key1,key2] --json
 ```
 
-종료 코드: 0 성공, 1 사용법 오류, 2 경로 없음/권한 없음, 3 규칙 파일 오류, 4 쓰기 실패.
+종료 코드: 0 성공, 1 사용법 오류, 2 경로 없음/권한 없음, 3 규칙 파일 오류, 4 설정 파일 쓰기/처리 실패.
 
 `--patch`의 JSON은 SSH로 넘길 때 임시 파일 대신 stdin(`--patch -`)으로도 받을 수 있게 한다.
 
@@ -528,10 +528,12 @@ macOS entitlements(샌드박스 해제, `com.apple.security.app-sandbox: false`)
 
 ### Phase 4 — 프로세스 계층과 엔진 CLI
 
-- [ ] ProcessRunner, SystemProcessRunner, FakeProcessRunner
-- [ ] VsCodeCli (code 경로 탐색 포함)
-- [ ] 6장의 엔진 CLI 명령 전부
-- [ ] `dart compile exe` 빌드 확인
+- [x] ProcessRunner, SystemProcessRunner, FakeProcessRunner
+- [x] VsCodeCli (code 경로 탐색 포함)
+- [x] 6장의 엔진 CLI 명령 전부
+- [x] `dart compile exe` 빌드 확인
+
+구현 메모: Windows에서 셸(`runInShell`)을 거칠 때는 인자에 `& | < > ^ % " `` 줄바꿈`이 있으면 실행하지 않고 오류로 돌려준다. 통합 테스트는 `dart_test.yaml`로 기본 제외(`dart test -t integration --run-skipped`). 종료 코드 4는 설정 파일 처리 실패(기존 settings.json이 잘못된 경우 포함)를 뜻하고, `diff-settings`도 `--replace-conflicts`를 받아 선택을 반영한 미리보기를 만든다.
 
 **완료 기준**: FakeProcessRunner 기반 테스트 통과. 컴파일된 실행 파일로 `analyze <픽스처> --json`이 올바른 JSON 출력.
 
