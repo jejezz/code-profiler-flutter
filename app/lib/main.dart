@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'about/about_dialog.dart';
@@ -38,19 +39,23 @@ Future<void> main() async {
   if (_isDesktop) {
     await windowManager.ensureInitialized();
     // ui-ux.md §5: 최소 크기는 960×600 이하 (1366×768 노트북).
-    // 위치는 center: true 대신 placeWindowAtStartup — window-placement.md.
+    // 위치는 WindowPlacement — window-placement.md.
     const size = Size(1200, 720);
-    const options = WindowOptions(
+    WindowPlacement? placement;
+    if (WindowPlacement.enabled) {
+      placement = WindowPlacement(await SharedPreferences.getInstance(), defaultSize: size);
+    }
+    final options = WindowOptions(
       size: size,
-      minimumSize: Size(960, 600),
-      center: false,
+      minimumSize: const Size(960, 600),
+      center: placement == null,
       title: AppIdentity.displayName,
     );
     await windowManager.waitUntilReadyToShow(options, () async {
-      await placeWindowAtStartup(size);
+      await placement?.placeInitially();
+      placement?.attach();
       await windowManager.show();
       await windowManager.focus();
-      LastDisplaySaver().start();
     });
   }
 
