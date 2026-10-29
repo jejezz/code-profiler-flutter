@@ -354,7 +354,9 @@ abstract interface class ProcessRunner {
 | --- | --- |
 | `version()` | `code --version` |
 | `listExtensions(profile)` | `code --profile <p> --list-extensions` |
-| `installExtension(profile, id)` | `code --profile <p> --install-extension <id>` (stream) |
+| `profileExists(profile)` | `code --profile <p> --list-extensions`가 성공하면 있음(없으면 `Profile '<p>' not found.`로 실패) |
+| `createProfile(profile, location)` | **VS Code CLI에는 프로필 생성 명령이 없다.** 없는 이름으로 `open(profile, location)`을 실행하면 빈 프로필이 만들어진다. 열기 뒤 `profileExists`를 1초 간격, 최대 60초 폴링 |
+| `installExtension(profile, id)` | `code --profile <p> --install-extension <id>` (stream). **프로필이 먼저 있어야 한다** |
 | `open(profile, location)` | Local: `code --profile <p> <path>` / SSH: `code --profile <p> --remote ssh-remote+<host> <path>` |
 
 - `code` 실행 파일 경로는 설정값. 기본값은 OS별 탐색 결과(PATH의 `code`, macOS `/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code`, Linux `/snap/bin/code`, `/usr/bin/code`).
@@ -406,7 +408,7 @@ profile-engine apply-settings <path> --patch <json-file> [--replace-conflicts ke
 | 분석 결과 | 판정 유형과 근거(Evidence) 목록, 트리 통계, 해석된 변수 |
 | 추천 편집 | 프로필 이름(기존 프로필 선택 또는 새 이름), 확장 체크리스트(필수/선택), notes |
 | 설정 diff | 추가/충돌/유지 항목, 충돌별 교체 토글, 주석 손실 경고, 적용 버튼 |
-| 적용 진행 | 단계별 진행: 프로필 확장 설치(줄 단위 로그) → 설정 쓰기 → 완료. 실패 시 단계와 메시지 |
+| 적용 진행 | 단계별 진행: 프로필 준비(없으면 프로젝트를 열어 생성) → 확장 설치(줄 단위 로그) → 설정 쓰기 → 완료. 실패 시 단계와 메시지 |
 | 설정 | `code` 경로, 사용자 규칙 파일 열기, 원격 엔진 배포 상태(호스트별) |
 
 ### 7.2 상태와 저장

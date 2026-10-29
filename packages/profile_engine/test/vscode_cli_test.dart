@@ -246,6 +246,147 @@ void main() {
     );
   });
 
+  group('profile creation', () {
+    const listArgs = ['--profile', 'Web / Python', '--list-extensions'];
+    const notFound = ProcessOutput(
+      exitCode: 1,
+      stderr: "Profile 'Web / Python' not found.\n",
+    );
+
+    VsCodeCli cli(
+      FakeProcessRunner fake, {
+      List<Duration>? waits,
+      Duration timeout = const Duration(seconds: 5),
+    }) => VsCodeCli(
+      fake,
+      codePath: 'code',
+      runInShell: false,
+      profilePollInterval: const Duration(seconds: 1),
+      profileTimeout: timeout,
+      wait: (d) async => waits?.add(d),
+    );
+
+    test('profileExists is true when --list-extensions succeeds', () async {
+      final fake = FakeProcessRunner()
+        ..onArgs(listArgs, output: const ProcessOutput(exitCode: 0));
+      expect(await cli(fake).profileExists('Web / Python'), isTrue);
+    });
+
+    test('profileExists is false for a missing profile', () async {
+      final fake = FakeProcessRunner()..onArgs(listArgs, output: notFound);
+      expect(await cli(fake).profileExists('Web / Python'), isFalse);
+    });
+
+    test(
+      'createProfile opens the project with the profile, then polls',
+      () async {
+        final fake = FakeProcessRunner()
+          ..onArgs(
+            listArgs,
+            outputs: [notFound, notFound, const ProcessOutput(exitCode: 0)],
+          )
+          ..onArgs(['--profile', 'Web / Python', '/work/app']);
+        final waits = <Duration>[];
+        final r = await cli(
+          fake,
+          waits: waits,
+        ).createProfile('Web / Python', const LocalLocation('/work/app'));
+        expect(r.isOk, isTrue);
+        // 열기 → (확인 실패, 확인 실패, 확인 성공)
+        expect(fake.calls.map((c) => c.args.last), [
+          '/work/app',
+          '--list-extensions',
+          '--list-extensions',
+          '--list-extensions',
+        ]);
+        expect(fake.calls.first.args, [
+          '--profile',
+          'Web / Python',
+          '/work/app',
+        ]);
+        expect(waits, hasLength(3));
+        expect(waits.every((d) => d == const Duration(seconds: 1)), isTrue);
+      },
+    );
+
+    test('createProfile on an SSH location opens the remote folder', () async {
+      final fake = FakeProcessRunner()
+        ..onArgs(listArgs)
+        ..onArgs(['--profile', 'Web / Python', '--remote']);
+      await cli(fake)
+          .createProfile('Web / Python', const SshLocation('devbox', '/srv/x'));
+      expect(fake.calls.first.args, [
+        '--profile',
+        'Web / Python',
+        '--remote',
+        'ssh-remote+devbox',
+        '/srv/x',
+      ]);
+    });
+
+    test('createProfile gives up after the timeout', () async {
+      final fake = FakeProcessRunner()
+        ..onArgs(listArgs, output: notFound)
+        ..onArgs(['--profile', 'Web / Python', '/work/app']);
+      final waits = <Duration>[];
+      final r = await cli(
+        fake,
+        waits: waits,
+        timeout: const Duration(seconds: 3),
+      ).createProfile('Web / Python', const LocalLocation('/work/app'));
+      expect(r.errorOrNull!.message, contains('3초'));
+      expect(r.errorOrNull!.message, contains('Web / Python'));
+      expect(waits, hasLength(3));
+    });
+
+    test('createProfile does not poll when opening fails', () async {
+      final fake = FakeProcessRunner()
+        ..onArgs([
+          '--profile',
+          'Web / Python',
+          '/work/app',
+        ], output: const ProcessOutput(exitCode: 1, stderr: 'cannot start'));
+      final waits = <Duration>[];
+      final r = await cli(
+        fake,
+        waits: waits,
+      ).createProfile('Web / Python', const LocalLocation('/work/app'));
+      expect(r.errorOrNull!.message, contains('cannot start'));
+      expect(waits, isEmpty);
+      expect(fake.calls, hasLength(1));
+    });
+
+    test('unsafe names never reach the process', () async {
+      final fake = FakeProcessRunner()..onArgs(['--profile']);
+      final c = VsCodeCli(
+        fake,
+        codePath: r'C:\VS\bin\code.cmd',
+        isWindows: true,
+        wait: (_) async {},
+      );
+      final r = await c.createProfile('a&b', const LocalLocation('/x'));
+      expect(r.isOk, isFalse);
+      expect(fake.calls, isEmpty);
+    });
+  });
+
+  group('FakeProcessRunner outputs', () {
+    test('responds in order and repeats the last one', () async {
+      final fake = FakeProcessRunner()
+        ..onArgs(
+          ['x'],
+          outputs: [
+            const ProcessOutput(exitCode: 1),
+            const ProcessOutput(exitCode: 2),
+          ],
+        );
+      final codes = [
+        for (var i = 0; i < 4; i++) (await fake.run('e', ['x'])).exitCode,
+      ];
+      expect(codes, [1, 2, 2, 2]);
+    });
+  });
+
   group('installExtensions', () {
     test('skips installed extensions, streams the rest', () async {
       final fake = FakeProcessRunner()

@@ -3,34 +3,20 @@
 구현된 것은 [IMPLEMENTED.md](IMPLEMENTED.md), 전체 설계와 Phase 정의는 [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
 작업 원칙은 [Claude.md](Claude.md): Phase 순서를 지키고, 완료 기준을 만족한 뒤 다음으로 간다. 설계와 다르게 구현할 이유가 생기면 사용자에게 알리고 문서를 함께 고친다.
 
-## 1. 지금 바로 할 일 — 프로필 생성 단계 추가 (Phase 5 수정)
+## 1. 지금 바로 할 일 — 프로필 생성 단계 수동 확인
 
-### 문제
-적용 중 `code --profile "Web / Python" --install-extension ...`이 `Profile 'Web / Python' not found.`로 실패한다. VS Code CLI에는 프로필 생성 명령이 없고, **없는 프로필 이름으로 `code --profile <이름> <폴더>`를 실행하면 빈 프로필이 만들어진다**(창이 열림). 확장 설치는 그 뒤에야 가능하다.
+구현은 끝났다(커밋 전). 적용 순서가 **프로필 준비 → 확장 설치 → 설정 쓰기**로 바뀌었다.
+VS Code CLI에는 프로필 생성 명령이 없어서, 프로필이 없으면 그 프로젝트를 `code --profile <이름> <폴더>`로 열어 만들고 `--list-extensions`가 성공할 때까지 폴링한다(최대 60초).
 
-### 설계 (아직 코드 변경 없음)
-적용 순서를 **프로필 준비 → 확장 설치 → 설정 쓰기**로 바꾼다.
+### 사용자가 확인할 점
+- 새 프로필 이름으로 적용하면 **프로젝트 창이 먼저 열린다**(프로필 생성 때문). 폴링이 끝나면 확장이 설치되고 설정이 쓰인다.
+- 창이 열린 뒤 설치된 확장이 **재시작 없이 활성화되는지**. 안 되면 완료 화면에 "창 다시 불러오기" 안내를 추가한다.
+- 이미 있는 프로필로 다시 적용하면 창이 새로 열리지 않는지(로그에 "프로필이 이미 있습니다").
+- 프로필 이름의 대소문자·공백·`+`·`/`가 VS Code에서 그대로 쓰이는지.
+- 폴링이 60초 안에 끝나지 않으면 "프로필이 만들어졌는지 확인하지 못했습니다" 오류가 나는지(느린 PC에서 `profileTimeout` 조정 필요 여부).
 
-1. **엔진 `VsCodeCli.ensureProfile(profile, location, {timeout = 60s, pollInterval = 1s, wait})`**
-   - `listExtensions(profile)`이 성공하면 이미 있는 프로필 → `ProfileState.existed`.
-   - 실패하면 `open(profile, location)`으로 프로젝트를 그 프로필로 열어 생성 → 성공할 때까지 `listExtensions`를 1초 간격으로 폴링 → `ProfileState.created`.
-   - 열기 실패나 시간 초과는 `Err`(시간 초과 메시지에 "VS Code가 시작 중이면 잠시 뒤 다시 시도").
-   - `wait`(지연 함수)를 주입 가능하게 해서 테스트가 실제로 기다리지 않게 한다.
-   - 이미 있던 프로필인지 새로 만들었는지는 구분해서 돌려준다(UI 로그용).
-2. **`FakeProcessRunner`** — 같은 인자에 호출마다 다른 응답을 주는 `outputs: List<ProcessOutput>` 지원(마지막 응답 반복). 폴링 테스트에 필요.
-3. **앱 `project_service.dart`** — `ApplyStep.profile` 추가(가장 앞), 이벤트 `ProfileExists` / `ProfileCreating` / `ProfileCreated`. 실패는 `StepFailed(profile, 메시지)`. 확장이 없어도 프로필 단계는 수행(적용 뒤 프로필이 존재하도록).
-4. **앱 화면 `apply_screen.dart`** — 단계 행 3개, 새 로그 문구. 진행 중 뒤로가기 막기는 유지.
-5. **문구(ko/en 쌍)**: `applyStepProfile`("프로필 준비"), `applyProfileExists`, `applyProfileCreating`("프로필이 없어 VS Code를 열어 새로 만듭니다: {name}"), `applyProfileCreated`.
-6. **테스트**
-   - 엔진: 있음 / 없음→생성(폴링 2~3회 후 성공) / 열기 실패 / 시간 초과 / 셸 특수문자 거부.
-   - 앱: `successEvents`에 프로필 단계 추가, 완료 아이콘 개수(2→3), 프로필 실패 시나리오, `LocalProjectService.apply` 이벤트 순서.
-   - 통합(`@Tags(['integration'])`): **임시 프로필 이름**으로 실제 생성 → 폴링 성공 확인. VS Code 창이 열리므로 사용자 동의 후에만 실행하고, 테스트 후 임시 프로필은 사용자가 VS Code에서 지우게 안내(엔진은 VS Code 내부 저장소에 쓰지 않는다).
-7. **문서** — IMPLEMENTATION_PLAN 5.2절(VsCodeCli 표)에 `ensureProfile` 추가, 5장 적용 흐름과 7.1 "적용 진행" 단계 갱신, IMPLEMENTED 갱신.
-
-### 확인할 점 (구현 후 사용자 수동 확인)
-- 새 프로필이 만들어질 때 프로젝트 창이 먼저 열린다. 그 창에서 이어서 설치된 확장이 **재시작 없이 활성화되는지** 확인(안 되면 완료 화면에 "창 다시 불러오기" 안내 추가).
-- 이미 있는 프로필로 다시 적용하면 창이 새로 열리지 않는지.
-- 프로필 이름 대소문자·공백·`+`·`/`가 VS Code에서 그대로 쓰이는지.
+### 남은 사항
+- 실제 VS Code로 프로필을 만드는 통합 테스트는 만들지 않았다(사용자 VS Code에 프로필이 남음). 필요하면 임시 이름으로 `@Tags(['integration'])` 테스트를 추가하고 사용자가 지우게 안내한다.
 
 ## 2. 그다음 — Phase 5 마무리
 

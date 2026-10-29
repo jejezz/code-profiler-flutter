@@ -55,14 +55,24 @@ class VsCodeCli {
   final bool _runInShell;
   final bool _isWindows;
 
-  /// [runInShell]은 기본값 false다(위 설명). [isWindows]는 테스트에서 바꿀 수 있다.
+  /// [createProfile]이 프로필이 생겼는지 확인하는 간격과 최대 대기 시간.
+  final Duration profilePollInterval;
+  final Duration profileTimeout;
+  final Future<void> Function(Duration) _wait;
+
+  /// [runInShell]은 기본값 false다(위 설명). [isWindows]와 [wait](대기 함수)는 테스트에서
+  /// 바꿀 수 있다.
   VsCodeCli(
     this._runner, {
     this.codePath = 'code',
     bool? runInShell,
     bool? isWindows,
+    this.profilePollInterval = const Duration(seconds: 1),
+    this.profileTimeout = const Duration(seconds: 60),
+    Future<void> Function(Duration)? wait,
   }) : _runInShell = runInShell ?? false,
-       _isWindows = isWindows ?? Platform.isWindows;
+       _isWindows = isWindows ?? Platform.isWindows,
+       _wait = wait ?? Future<void>.delayed;
 
   /// 인자가 `cmd`에 해석될 수 있는 실행 방식인지(셸을 거치거나 Windows 배치 파일).
   bool get _argsReachCmd =>
@@ -114,6 +124,41 @@ class VsCodeCli {
       for (final l in out.stdout.split('\n'))
         if (l.trim().isNotEmpty) l.trim().toLowerCase(),
     ]);
+  }
+
+  /// [profile]이 VS Code에 이미 있는지.
+  ///
+  /// `--list-extensions`는 없는 프로필에 `Profile '<이름>' not found.`로 실패하므로, 성공하면
+  /// 있는 것으로 본다. 다른 이유로 실패해도 false이고, 그 경우 [createProfile]이 같은 원인을
+  /// 오류로 돌려준다.
+  Future<bool> profileExists(String profile) async =>
+      (await listExtensions(profile)).isOk;
+
+  /// 없는 프로필을 만든다.
+  ///
+  /// VS Code CLI에는 프로필 생성 명령이 없다. **없는 이름으로 `code --profile <이름> <폴더>`를
+  /// 실행하면 빈 프로필이 만들어지고 그 폴더가 그 프로필로 열린다.** 그래서 [location]을
+  /// 그 프로필로 연 뒤, [profileTimeout] 안에 `--list-extensions`가 성공할 때까지
+  /// [profilePollInterval]마다 확인한다. 확장 설치는 프로필이 생긴 뒤에야 가능하다.
+  Future<Result<void>> createProfile(
+    String profile,
+    ProjectLocation location,
+  ) async {
+    final opened = await open(profile, location);
+    if (opened is Err<void>) return opened;
+
+    var waited = Duration.zero;
+    while (waited < profileTimeout) {
+      await _wait(profilePollInterval);
+      waited += profilePollInterval;
+      if (await profileExists(profile)) return const Ok(null);
+    }
+    return Err(
+      EngineError(
+        "프로필 '$profile'이(가) 만들어졌는지 ${profileTimeout.inSeconds}초 안에 확인하지 못했습니다. "
+        'VS Code가 시작 중이면 잠시 뒤 다시 시도하세요',
+      ),
+    );
   }
 
   /// 확장 하나를 설치한다. 출력을 줄 단위로 흘리고 마지막에 [ProcessExited]가 온다.

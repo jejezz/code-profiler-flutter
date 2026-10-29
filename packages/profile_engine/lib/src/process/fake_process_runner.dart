@@ -34,12 +34,16 @@ final class FakeProcessRunner implements ProcessRunner {
 
   /// 실행 파일과 인자가 [matches]를 만족하면 [output]을 돌려준다.
   /// [start]로 호출되면 [events]가 있으면 그것을, 없으면 [output]의 출력을 줄 단위로 흘린다.
+  ///
+  /// [outputs]를 주면 호출할 때마다 차례로 하나씩 돌려주고 마지막 응답을 반복한다
+  /// (예: 처음 몇 번은 실패하다 성공하는 폴링).
   void on(
     bool Function(String executable, List<String> args) matches, {
     ProcessOutput output = const ProcessOutput(exitCode: 0),
     List<ProcessEvent>? events,
+    List<ProcessOutput>? outputs,
   }) {
-    _stubs.add(_Stub(matches, output, events));
+    _stubs.add(_Stub(matches, output, events, outputs));
   }
 
   /// 인자가 [prefix]로 시작하는 호출에 응답한다(실행 파일은 따지지 않는다).
@@ -47,6 +51,7 @@ final class FakeProcessRunner implements ProcessRunner {
     List<String> prefix, {
     ProcessOutput output = const ProcessOutput(exitCode: 0),
     List<ProcessEvent>? events,
+    List<ProcessOutput>? outputs,
   }) {
     on(
       (exe, args) =>
@@ -55,6 +60,7 @@ final class FakeProcessRunner implements ProcessRunner {
               .every((b) => b),
       output: output,
       events: events,
+      outputs: outputs,
     );
   }
 
@@ -69,6 +75,7 @@ final class FakeProcessRunner implements ProcessRunner {
         stderr:
             'FakeProcessRunner: no response for "$executable ${args.join(' ')}"',
       ),
+      null,
       null,
     );
   }
@@ -89,7 +96,7 @@ final class FakeProcessRunner implements ProcessRunner {
         streamed: false,
       ),
     );
-    return _find(executable, args).output;
+    return _find(executable, args).nextOutput();
   }
 
   @override
@@ -124,6 +131,15 @@ final class _Stub {
   final bool Function(String, List<String>) matches;
   final ProcessOutput output;
   final List<ProcessEvent>? events;
+  final List<ProcessOutput>? outputs;
+  var _calls = 0;
 
-  _Stub(this.matches, this.output, this.events);
+  _Stub(this.matches, this.output, this.events, this.outputs);
+
+  ProcessOutput nextOutput() {
+    final list = outputs;
+    if (list == null || list.isEmpty) return output;
+    final i = _calls++;
+    return list[i < list.length ? i : list.length - 1];
+  }
 }

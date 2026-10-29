@@ -14,7 +14,7 @@
 | 4 | 프로세스 계층·`VsCodeCli`·엔진 CLI | 완료 | `d45459b` |
 | 5 | 앱(로컬 프로젝트) | 구현 완료, **수동 확인 중**, **커밋 전** | — |
 
-테스트: 엔진 165개 통과(+통합 2개는 기본 제외), 앱 116개 통과. `dart analyze`·`flutter analyze` 경고 0.
+테스트: 엔진 173개 통과(+통합 2개는 기본 제외), 앱 121개 통과. `dart analyze`·`flutter analyze` 경고 0.
 
 ## 2. 저장소 구조 (실제)
 
@@ -42,7 +42,7 @@ code-profiler-flutter/
 | 추천기 | `lib/src/recommender/` | 3.3절 규칙(주 유형 프로필, 확장 합침/선택, settings 병합, `${변수}` 치환·예약 변수 보존·미해석 시 항목 제외+경고) |
 | 설정 처리 | `lib/src/settings/` | JSONC 파서, 병합(표 4.2)+JSON Pointer 식별, `SettingsDiff`, `.bak.<타임스탬프>` 백업 + 임시 파일→rename 쓰기 |
 | 프로세스 | `lib/src/process/` | `ProcessRunner` 인터페이스, `SystemProcessRunner`, `FakeProcessRunner`. 출력은 UTF-8 → 실패 시 시스템 인코딩(cp949 등) |
-| VS Code | `lib/src/vscode/` | `VsCodeCli`(version, listExtensions, installExtension(s), open), `discoverCodePath` |
+| VS Code | `lib/src/vscode/` | `VsCodeCli`(version, listExtensions, **profileExists, createProfile**, installExtension(s), open), `discoverCodePath`. 프로필은 CLI에 생성 명령이 없어, 없는 이름으로 프로젝트를 열어 만들고 `--list-extensions`가 성공할 때까지 폴링한다 |
 | CLI | `lib/src/cli/engine_cli.dart`, `bin/profile_engine.dart` | `--version`, `analyze`, `recommend`, `diff-settings`, `apply-settings`. `--json`이면 stdout에 JSON 하나. 종료 코드 0/1/2/3/4. `dart compile exe` 확인 완료 |
 
 ### 알아둘 동작·결정
@@ -79,11 +79,11 @@ Saturn 테마·SeoulNamsan 글꼴·gen-l10n(ko/en)·라이트/다크·`window_ma
 | # | 증상 | 원인 | 조치 | 상태 |
 |---|---|---|---|---|
 | 1 | 적용 시 `'...\Microsoft' 은(는) 명령이 아닙니다` + 한글 깨짐 | `runInShell`에서 `cmd`가 따옴표 처리 실패 / UTF-8 고정 디코딩 | 셸 없이 직접 실행, 디코딩 폴백, 회귀 테스트 | 수정·테스트 통과 (커밋 전) |
-| 2 | 적용 시 `Profile 'Web / Python' not found.` | VS Code는 **없는 프로필**에 `--install-extension`을 못 한다. 프로필 생성 단계가 설계에 없었음 | 아직 코드 변경 없음 — [PLAN.md](PLAN.md) §1 참고 | **미해결** |
+| 2 | 적용 시 `Profile 'Web / Python' not found.` | VS Code는 **없는 프로필**에 `--install-extension`을 못 한다. 프로필 생성 단계가 설계에 없었음 | 적용 순서를 프로필 준비 → 확장 설치 → 설정 쓰기로 변경(`createProfile`, `ApplyStep.profile`), 테스트 추가 | 구현·테스트 통과 (커밋 전), **실제 VS Code 수동 확인 필요** |
 
 ## 6. 현재 작업 트리
 
-- 마지막 커밋: `d45459b` (Phase 4). **Phase 5 전체와 위 수정 1번은 모두 미커밋.**
+- 마지막 커밋: `a3c664a` (Phase 5). **프로필 생성 단계(수정 2번)는 미커밋.**
 - 사용자 실행 중인 디버그 앱이 `code_profiler.exe`를 잠그므로, 빌드 전에 앱을 닫아야 한다. 검증용 릴리스 빌드는 `app/build/windows/x64/runner/Release/`에 있다.
 - 수동 확인용 샘플: 스크래치패드 `samples/esp-idf-sample`(주석·충돌 있는 `.vscode/settings.json` 포함), `samples/gradle-sample`.
 - 주의: `app/lib`의 템플릿 복사 파일(`about/`, `settings/`, `theme/`, `update/`, `window/`, `app_identity.dart`)은 `dart format`으로 다시 정렬하지 않는다(린트가 새로 생김). 내가 쓴 파일만 포맷한다.

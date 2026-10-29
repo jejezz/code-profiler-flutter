@@ -58,6 +58,7 @@ class _ApplyScreenState extends ConsumerState<ApplyScreen> {
   String _stepLabel(ApplyStep step) {
     final l10n = AppLocalizations.of(context);
     return switch (step) {
+      ApplyStep.profile => l10n.applyStepProfile,
       ApplyStep.extensions => l10n.applyStepExtensions,
       ApplyStep.settings => l10n.applyStepSettings,
     };
@@ -79,7 +80,7 @@ class _ApplyScreenState extends ConsumerState<ApplyScreen> {
         .apply(widget.plan)
         .listen(
           _onEvent,
-          onError: (Object e) => _fail(ApplyStep.extensions, '$e'),
+          onError: (Object e) => _fail(ApplyStep.profile, '$e'),
           onDone: _onDone,
         );
   }
@@ -111,6 +112,12 @@ class _ApplyScreenState extends ConsumerState<ApplyScreen> {
           if (step == ApplyStep.extensions && widget.plan.extensions.isEmpty) {
             _add(l10n.applyNoExtensions);
           }
+        case ProfileExists():
+          _add(l10n.applyProfileExists(widget.plan.profileName));
+        case ProfileCreating():
+          _add(l10n.applyProfileCreating(widget.plan.profileName));
+        case ProfileCreated():
+          _add(l10n.applyProfileCreated(widget.plan.profileName));
         case ExtensionSkipped(:final id):
           _add(l10n.applyExtSkipped(id));
         case ExtensionStarted(:final id):

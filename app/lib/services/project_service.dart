@@ -34,7 +34,8 @@ class ApplyPlan {
   final Set<String> replaceConflicts;
 }
 
-enum ApplyStep { extensions, settings }
+/// 적용 단계. 프로필이 있어야 확장을 설치할 수 있으므로 프로필 준비가 가장 앞이다.
+enum ApplyStep { profile, extensions, settings }
 
 /// 적용 진행 이벤트. 화면이 현재 언어로 문구를 만들 수 있도록 문구 대신 데이터를 담는다.
 sealed class ApplyEvent {
@@ -45,6 +46,20 @@ final class StepStarted extends ApplyEvent {
   const StepStarted(this.step);
 
   final ApplyStep step;
+}
+
+/// 프로필이 이미 있다.
+final class ProfileExists extends ApplyEvent {
+  const ProfileExists();
+}
+
+/// 프로필이 없어 VS Code를 열어 새로 만드는 중이다(수십 초 걸릴 수 있다).
+final class ProfileCreating extends ApplyEvent {
+  const ProfileCreating();
+}
+
+final class ProfileCreated extends ApplyEvent {
+  const ProfileCreated();
 }
 
 final class ExtensionSkipped extends ApplyEvent {
@@ -202,9 +217,28 @@ class LocalProjectService implements ProjectService {
   Stream<ApplyEvent> apply(ApplyPlan plan) async* {
     final path = _localPath(plan.project);
     if (path == null) {
-      yield StepFailed(ApplyStep.extensions, _sshError.message);
+      yield StepFailed(ApplyStep.profile, _sshError.message);
       return;
     }
+
+    // 프로필이 없으면 확장을 설치할 수 없다. CLI에는 생성 명령이 없어서, 없는 이름으로
+    // 프로젝트를 열면 만들어지는 동작을 이용한다(VsCodeCli.createProfile).
+    yield const StepStarted(ApplyStep.profile);
+    if (await cli.profileExists(plan.profileName)) {
+      yield const ProfileExists();
+    } else {
+      yield const ProfileCreating();
+      final created = await cli.createProfile(
+        plan.profileName,
+        plan.project.location,
+      );
+      if (created is Err<void>) {
+        yield StepFailed(ApplyStep.profile, created.error.message);
+        return;
+      }
+      yield const ProfileCreated();
+    }
+    yield const StepFinished(ApplyStep.profile);
 
     yield const StepStarted(ApplyStep.extensions);
     final failed = <String>[];

@@ -30,7 +30,14 @@ Project _local(Directory dir) => Project(
 );
 
 LocalProjectService _service(FakeProcessRunner fake) => LocalProjectService(
-  cli: VsCodeCli(fake, codePath: 'code', runInShell: false),
+  cli: VsCodeCli(
+    fake,
+    codePath: 'code',
+    runInShell: false,
+    // 프로필 생성 폴링이 실제로 기다리지 않게 한다.
+    profileTimeout: const Duration(seconds: 3),
+    wait: (_) async {},
+  ),
   loadRules: () async => loadDefaultRules(),
   // 위젯 테스트 환경에서 Isolate를 쓰지 않도록 동기 분석을 감싼다.
   analyzer: (path, {rules}) async => analyzeSync(path, rules: rules!),
@@ -132,6 +139,9 @@ void main() {
           .toList();
       expect(events.map((e) => e.runtimeType), [
         StepStarted,
+        ProfileExists,
+        StepFinished,
+        StepStarted,
         ExtensionSkipped,
         ExtensionStarted,
         ExtensionOutput,
@@ -153,6 +163,103 @@ void main() {
         hasLength(1),
       );
     });
+
+    test(
+      'a missing profile is created by opening the project, then used',
+      () async {
+        final fx = _fixture({'a.txt': ''});
+        const notFound = ProcessOutput(
+          exitCode: 1,
+          stderr: "Profile 'Web / Python' not found.",
+        );
+        final fake = FakeProcessRunner()
+          ..onArgs(
+            ['--profile', 'Web / Python', '--list-extensions'],
+            outputs: const [notFound, notFound, ProcessOutput(exitCode: 0)],
+          )
+          ..onArgs(['--profile', 'Web / Python', fx.path])
+          ..onArgs(
+            ['--profile', 'Web / Python', '--install-extension', 'a.b'],
+            events: const [ProcessExited(0)],
+          );
+        final events = await _service(fake)
+            .apply(
+              ApplyPlan(
+                project: _local(fx),
+                profileName: 'Web / Python',
+                extensions: const ['a.b'],
+                settingsPatch: const {'x': 1},
+              ),
+            )
+            .toList();
+        expect(events.whereType<ProfileCreating>(), hasLength(1));
+        expect(events.whereType<ProfileCreated>(), hasLength(1));
+        expect(events.whereType<ProfileExists>(), isEmpty);
+        expect(events.whereType<StepFailed>(), isEmpty);
+        // 순서: 존재 확인 → 프로젝트 열기(프로필 생성) → 폴링 → 설치.
+        final order = [for (final c in fake.calls) c.args.sublist(2).join(' ')];
+        expect(order.first, '--list-extensions');
+        expect(order[1], fx.path);
+        expect(order.indexOf('--install-extension a.b'), greaterThan(1));
+        expect(File('${fx.path}/.vscode/settings.json').existsSync(), isTrue);
+      },
+    );
+
+    test('if the profile cannot be created, nothing else runs', () async {
+      final fx = _fixture({'a.txt': ''});
+      final fake = FakeProcessRunner()
+        ..onArgs([
+          '--profile',
+          'P',
+          '--list-extensions',
+        ], output: const ProcessOutput(exitCode: 1, stderr: 'not found'))
+        ..onArgs(['--profile', 'P', fx.path]);
+      final events = await _service(fake)
+          .apply(
+            ApplyPlan(
+              project: _local(fx),
+              profileName: 'P',
+              extensions: const ['a.b'],
+              settingsPatch: const {'x': 1},
+            ),
+          )
+          .toList();
+      final failed = events.last as StepFailed;
+      expect(failed.step, ApplyStep.profile);
+      expect(failed.message, contains('P'));
+      expect(
+        fake.calls.where((c) => c.args.contains('--install-extension')),
+        isEmpty,
+      );
+      expect(Directory('${fx.path}/.vscode').existsSync(), isFalse);
+    });
+
+    test(
+      'a profile name with shell characters fails at the profile step',
+      () async {
+        final fx = _fixture({'a.txt': ''});
+        final service = LocalProjectService(
+          cli: VsCodeCli(
+            FakeProcessRunner(),
+            codePath: r'C:\VS\bin\code.cmd',
+            isWindows: true,
+            wait: (_) async {},
+          ),
+          loadRules: () async => loadDefaultRules(),
+        );
+        final events = await service
+            .apply(
+              ApplyPlan(
+                project: _local(fx),
+                profileName: 'a&b',
+                extensions: const [],
+                settingsPatch: const {},
+              ),
+            )
+            .toList();
+        expect((events.last as StepFailed).step, ApplyStep.profile);
+      },
+    );
 
     test('with no extensions only the settings are written', () async {
       final fx = _fixture({'a.txt': ''});
@@ -193,6 +300,7 @@ void main() {
       expect(failed.step, ApplyStep.extensions);
       expect(failed.message, 'bad.ext');
       expect(events.whereType<StepStarted>().map((e) => e.step), [
+        ApplyStep.profile,
         ApplyStep.extensions,
       ]);
       expect(Directory('${fx.path}/.vscode').existsSync(), isFalse);
