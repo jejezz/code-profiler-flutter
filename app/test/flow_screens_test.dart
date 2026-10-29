@@ -287,7 +287,8 @@ void main() {
       final h = Harness(projects: [sampleProject(id: 'p1')]);
       await h.pump(tester, ApplyScreen(plan: plan()));
 
-      expect(find.byIcon(Icons.check_circle_rounded), findsNWidgets(2));
+      expect(find.byIcon(Icons.check_circle_rounded), findsNWidgets(3));
+      expect(find.text(en.applyProfileExists('Java')), findsOneWidget);
       expect(find.text('Installing a.b'), findsOneWidget);
       expect(find.text(en.applySettingsWritten), findsOneWidget);
       expect(
@@ -359,6 +360,9 @@ void main() {
     testWidgets('a settings failure marks the settings step', (tester) async {
       final h = Harness(projects: [sampleProject(id: 'p1')]);
       h.service.onApply = (_) => Stream.fromIterable(const [
+        StepStarted(ApplyStep.profile),
+        ProfileExists(),
+        StepFinished(ApplyStep.profile),
         StepStarted(ApplyStep.extensions),
         StepFinished(ApplyStep.extensions),
         StepStarted(ApplyStep.settings),
@@ -369,8 +373,47 @@ void main() {
         find.text(en.applyFailedStep(en.applyStepSettings, 'JSON 문법 오류')),
         findsOneWidget,
       );
-      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle_rounded), findsNWidgets(2));
       expect(find.byIcon(Icons.error_rounded), findsOneWidget);
+    });
+
+    testWidgets('a missing profile is announced while it is created', (
+      tester,
+    ) async {
+      final h = Harness(projects: [sampleProject(id: 'p1')]);
+      h.service.onApply = (plan) => Stream.fromIterable([
+        const StepStarted(ApplyStep.profile),
+        const ProfileCreating(),
+        const ProfileCreated(),
+        const StepFinished(ApplyStep.profile),
+        ...successEvents(plan).skip(3),
+      ]);
+      await h.pump(tester, ApplyScreen(plan: plan()));
+
+      expect(find.text(en.applyProfileCreating('Java')), findsOneWidget);
+      expect(find.text(en.applyProfileCreated('Java')), findsOneWidget);
+      expect(find.text(en.applyStepProfile), findsOneWidget);
+      expect(find.text(en.applyDone), findsOneWidget);
+    });
+
+    testWidgets('a profile that cannot be created stops before any install', (
+      tester,
+    ) async {
+      final h = Harness(projects: [sampleProject(id: 'p1')]);
+      h.service.onApply = (_) => Stream.fromIterable(const [
+        StepStarted(ApplyStep.profile),
+        ProfileCreating(),
+        StepFailed(ApplyStep.profile, 'timed out'),
+      ]);
+      await h.pump(tester, ApplyScreen(plan: plan()));
+
+      expect(
+        find.text(en.applyFailedStep(en.applyStepProfile, 'timed out')),
+        findsOneWidget,
+      );
+      expect(find.byIcon(Icons.error_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+      expect(h.store.saved.single.profileName, isNull);
     });
   });
 

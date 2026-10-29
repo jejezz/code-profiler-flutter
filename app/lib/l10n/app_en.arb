@@ -341,6 +341,16 @@
   },
   "applyBackToList": "Back to list",
   "settingsTitle": "Settings",
+  "settingsSectionAppearance": "Appearance",
+  "settingsMode": "Mode",
+  "settingsModeSystem": "System",
+  "settingsPalette": "Color scheme",
+  "settingsPaletteSaturn": "Saturn",
+  "settingsPaletteTeal": "Teal",
+  "settingsPaletteAmber": "Amber",
+  "settingsPaletteRose": "Rose",
+  "settingsPaletteSlate": "Slate",
+  "settingsPaletteHighContrast": "High contrast",
   "settingsCodePath": "VS Code executable (code) path",
   "settingsCodePathHint": "Leave empty to detect it automatically",
   "settingsDetect": "Detect",
@@ -372,5 +382,30 @@
       }
     }
   },
-  "settingsSaved": "Saved"
+  "settingsSaved": "Saved",
+  "applyStepProfile": "Prepare profile",
+  "applyProfileExists": "The profile already exists: {name}",
+  "@applyProfileExists": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "applyProfileCreating": "The profile does not exist, so VS Code is opened to create it: {name} (this can take a while)",
+  "@applyProfileCreating": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "applyProfileCreated": "Profile created: {name}",
+  "@applyProfileCreated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

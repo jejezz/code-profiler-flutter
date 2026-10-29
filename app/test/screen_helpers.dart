@@ -75,6 +75,9 @@ class FakeProjectService implements ProjectService {
 }
 
 List<ApplyEvent> successEvents(ApplyPlan plan) => [
+  const StepStarted(ApplyStep.profile),
+  const ProfileExists(),
+  const StepFinished(ApplyStep.profile),
   const StepStarted(ApplyStep.extensions),
   for (final e in plan.extensions) ...[
     ExtensionStarted(e),

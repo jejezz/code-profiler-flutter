@@ -472,6 +472,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsTitle => 'Settings';
 
   @override
+  String get settingsSectionAppearance => 'Appearance';
+
+  @override
+  String get settingsMode => 'Mode';
+
+  @override
+  String get settingsModeSystem => 'System';
+
+  @override
+  String get settingsPalette => 'Color scheme';
+
+  @override
+  String get settingsPaletteSaturn => 'Saturn';
+
+  @override
+  String get settingsPaletteTeal => 'Teal';
+
+  @override
+  String get settingsPaletteAmber => 'Amber';
+
+  @override
+  String get settingsPaletteRose => 'Rose';
+
+  @override
+  String get settingsPaletteSlate => 'Slate';
+
+  @override
+  String get settingsPaletteHighContrast => 'High contrast';
+
+  @override
   String get settingsCodePath => 'VS Code executable (code) path';
 
   @override
@@ -510,4 +540,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSaved => 'Saved';
+
+  @override
+  String get applyStepProfile => 'Prepare profile';
+
+  @override
+  String applyProfileExists(String name) {
+    return 'The profile already exists: $name';
+  }
+
+  @override
+  String applyProfileCreating(String name) {
+    return 'The profile does not exist, so VS Code is opened to create it: $name (this can take a while)';
+  }
+
+  @override
+  String applyProfileCreated(String name) {
+    return 'Profile created: $name';
+  }
 }

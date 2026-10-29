@@ -12,7 +12,6 @@ import 'package:profile_engine/profile_engine.dart';
 import '../app_identity.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/providers.dart';
-import '../settings/settings_menus.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common.dart';
 import '../window/focus_tint.dart';
@@ -115,10 +114,7 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
     }
   }
 
-  void _openSettings() {
-    Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (_) => const SettingsScreen()));
-  }
+  void _openSettings() => showSettingsDialog(context);
 
   @override
   Widget build(BuildContext context) {
@@ -147,8 +143,6 @@ class _ProjectListScreenState extends ConsumerState<ProjectListScreen> {
                 icon: const Icon(Icons.settings_outlined),
                 onPressed: _openSettings,
               ),
-              const ThemeMenuButton(),
-              const LanguageMenuButton(),
               IconButton(
                 tooltip: l10n.aboutTooltip,
                 icon: const Icon(Icons.info_outline_rounded),

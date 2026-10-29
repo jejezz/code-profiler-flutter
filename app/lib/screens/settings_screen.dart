@@ -6,11 +6,15 @@ import 'package:profile_engine/profile_engine.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/providers.dart';
 import '../services/app_config.dart';
+import '../settings/settings_menus.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common.dart';
-import '../window/focus_tint.dart';
 
-/// 앱 설정. 지금은 VS Code 실행 파일(`code`) 경로만 다룬다.
+/// 설정 대화상자: 데스크톱 전용 앱이라 모달로 띄운다 (settings-screen.md §1).
+Future<void> showSettingsDialog(BuildContext context) =>
+    showDialog<void>(context: context, builder: (_) => const SettingsScreen());
+
+/// 앱 설정: 외형(모드·색 구성·언어)과 VS Code 실행 파일(`code`) 경로.
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -98,57 +102,73 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: const FocusTint(),
-        title: Text(l10n.settingsTitle),
-      ),
-      body: PageBody(
-        maxWidth: 720,
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            SectionHeader(l10n.settingsCodePath),
-            TextField(
-              controller: _codePath,
-              style: AppFonts.userContent,
-              decoration: InputDecoration(hintText: l10n.settingsCodePathHint),
-              onSubmitted: (_) => _save(),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
-              children: [
-                OutlinedButton(
-                  onPressed: _detect,
-                  child: Text(l10n.settingsDetect),
-                ),
-                OutlinedButton(
-                  onPressed: _browse,
-                  child: Text(l10n.settingsBrowse),
-                ),
-                OutlinedButton(
-                  onPressed: _busy ? null : _test,
-                  child: Text(l10n.settingsTest),
-                ),
-                FilledButton(onPressed: _save, child: Text(l10n.settingsSave)),
-              ],
-            ),
-            if (_status != null) ...[
+    return AlertDialog(
+      title: Text(l10n.settingsTitle),
+      content: SizedBox(
+        width: 480,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SectionHeader(l10n.settingsSectionAppearance),
+              Text(l10n.settingsMode, style: theme.textTheme.bodySmall),
+              const SizedBox(height: AppSpacing.xs),
+              const ModeSegmentedButton(),
               const SizedBox(height: AppSpacing.md),
-              Text(
-                _status!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: _statusIsError
-                      ? theme.colorScheme.error
-                      : successColor(context),
-                ),
+              Text(l10n.settingsPalette, style: theme.textTheme.bodySmall),
+              const SizedBox(height: AppSpacing.xs),
+              const AccentPaletteChips(),
+              const SizedBox(height: AppSpacing.md),
+              Text(l10n.languageMenuTooltip, style: theme.textTheme.bodySmall),
+              const SizedBox(height: AppSpacing.xs),
+              const LanguageSegmentedButton(),
+              const SizedBox(height: AppSpacing.xl),
+              SectionHeader(l10n.settingsCodePath),
+              TextField(
+                controller: _codePath,
+                style: AppFonts.userContent,
+                decoration: InputDecoration(hintText: l10n.settingsCodePathHint),
+                onSubmitted: (_) => _save(),
               ),
+              const SizedBox(height: AppSpacing.md),
+              Wrap(
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
+                children: [
+                  OutlinedButton(
+                    onPressed: _detect,
+                    child: Text(l10n.settingsDetect),
+                  ),
+                  OutlinedButton(
+                    onPressed: _browse,
+                    child: Text(l10n.settingsBrowse),
+                  ),
+                  OutlinedButton(
+                    onPressed: _busy ? null : _test,
+                    child: Text(l10n.settingsTest),
+                  ),
+                  FilledButton(onPressed: _save, child: Text(l10n.settingsSave)),
+                ],
+              ),
+              if (_status != null) ...[
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  _status!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: _statusIsError
+                        ? theme.colorScheme.error
+                        : successColor(context),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(l10n.commonClose)),
+      ],
     );
   }
 }

@@ -466,6 +466,36 @@ class AppLocalizationsKo extends AppLocalizations {
   String get settingsTitle => '설정';
 
   @override
+  String get settingsSectionAppearance => '외형';
+
+  @override
+  String get settingsMode => '모드';
+
+  @override
+  String get settingsModeSystem => '시스템';
+
+  @override
+  String get settingsPalette => '색 구성';
+
+  @override
+  String get settingsPaletteSaturn => '새턴';
+
+  @override
+  String get settingsPaletteTeal => '청록';
+
+  @override
+  String get settingsPaletteAmber => '호박';
+
+  @override
+  String get settingsPaletteRose => '장미';
+
+  @override
+  String get settingsPaletteSlate => '슬레이트';
+
+  @override
+  String get settingsPaletteHighContrast => '고대비';
+
+  @override
   String get settingsCodePath => 'VS Code 실행 파일(code) 경로';
 
   @override
@@ -503,4 +533,22 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get settingsSaved => '저장했습니다';
+
+  @override
+  String get applyStepProfile => '프로필 준비';
+
+  @override
+  String applyProfileExists(String name) {
+    return '프로필이 이미 있습니다: $name';
+  }
+
+  @override
+  String applyProfileCreating(String name) {
+    return '프로필이 없어 VS Code를 열어 새로 만듭니다: $name (수십 초 걸릴 수 있습니다)';
+  }
+
+  @override
+  String applyProfileCreated(String name) {
+    return '프로필을 만들었습니다: $name';
+  }
 }
